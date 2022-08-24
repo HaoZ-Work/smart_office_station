@@ -14,7 +14,7 @@
       <div class="col">
         <!-- <button type="button " class="btn btn-primary" >Station 01
         </button> -->
-        <center><h3>Smart Station 01</h3>
+        <center><h3>User01</h3>
         <SmartStation ></SmartStation>
         </center>
       <p></p>
