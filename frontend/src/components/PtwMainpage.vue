@@ -17,10 +17,18 @@
         <center><h3>Smart Station 01</h3>
         <SmartStation ></SmartStation>
         </center>
+      <p></p>
+        <!-- <center><h3>Smart Station 02</h3>
+        <SmartStation ></SmartStation>
+        </center> -->
       </div>
       <!-- <div class="col">Station 02</div>
       <div class="col">Station 03</div> -->
+
     </div>
+
+
+
     
   </center>
 
@@ -41,11 +49,7 @@ export default {
 }
 
 // export default Vue.component("PtwMainpage",{
-//       components: { SmartStation }
 
-// }
-
-// )
 
 </script>
 

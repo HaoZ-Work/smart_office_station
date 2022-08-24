@@ -24,8 +24,8 @@
     
   </tbody>
 </table>
-<button type="button " class="btn btn-primary" v-on:click="update_values()" >update
-        </button>
+<!-- <button type="button " class="btn btn-primary" v-on:click="update_values()" >update
+        </button> -->
 
 
 </template>
@@ -33,9 +33,11 @@
 
 <script>
 
-// import { getValues } from '../api'
+
+
 
 import axios from 'axios'
+
 
 
 
@@ -65,7 +67,7 @@ export default{
       sent_request : function() {
       var config = {
       method: 'get',
-      url: '/dht22_data/get_last/',
+      url: '/dht22/user01/',
       headers: {}};
   
       axios(config)
@@ -88,8 +90,27 @@ export default{
         this.sent_request()
         // console.log(this.temp)
         // console.log()
+     
+      },
+      sleep :  function(ms){
+          return new Promise(resolve => setTimeout(resolve, ms));
+
+      },
+      auto_update: async function() {
+        var T = true
+        while (T){
+          await this.sleep(3000)
+          this.sent_request()
+        }
+     
+
       }
 
+    },
+    mounted(){
+    
+      this.update_values()
+      this.auto_update()
     }
     
 
