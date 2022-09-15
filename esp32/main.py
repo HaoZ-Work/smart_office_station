@@ -33,12 +33,13 @@ def main():
   print("Connecting to WiFi", end="")
   sta_if = network.WLAN(network.STA_IF)
   sta_if.active(True)
-  sta_if.connect('Wokwi-GUEST', '')
+  # sta_if.connect('Wokwi-GUEST', '')
+  sta_if.connect('H2G', 'zh970201')
   while not sta_if.isconnected():
     print(".", end="")
     time.sleep(1)
   print("Connected!")
-  oled.text("WiFi Connected!",0,10)
+  oled.text("WiFi Connected!!",0,10)
   oled.show()
   time.sleep(0.5)
   
