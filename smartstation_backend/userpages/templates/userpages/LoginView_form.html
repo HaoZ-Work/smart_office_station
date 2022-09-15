@@ -1,0 +1,17 @@
+<html>
+   <head>
+       <title>LoginView</title>
+       
+   </head>
+
+   <body>
+<form method="POST" action="{% url 'userdetail' %}">{% csrf_token %}
+   
+<!-- form variable -->    
+{{ form.as_p }} 
+
+ <input type="submit" name="sumbit">
+</form>
+   </body>
+
+</html>
