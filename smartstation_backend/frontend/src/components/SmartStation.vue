@@ -1,6 +1,6 @@
 <template>
 
-
+<!-- <P>Data for {{this.user}}</P> -->
 <table class="table">
   <thead>
     <tr>
@@ -43,7 +43,9 @@ import axios from 'axios'
 
 export default{
     name: 'SmartStation',
-    props:['id'],
+    props:{
+      user:String
+    },
     data(){
       return {
         temp:0,
@@ -67,7 +69,7 @@ export default{
       sent_request : function() {
       var config = {
       method: 'get',
-      url: '/dht22/user01/',
+      url: 'http://127.0.0.1/api/dht22/user01/',
       headers: {}};
   
       axios(config)

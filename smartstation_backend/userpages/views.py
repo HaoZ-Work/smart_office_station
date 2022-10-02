@@ -37,7 +37,11 @@ def userview(request):
         login(request, user)
         # Redirect to a success page.
         ...
-        return render(request, 'userpages/userpage.html', {
+        # return render(request, 'userpages/userpage.html', {
+        #     'user':user
+            
+        # })
+        return render(request, 'index.html', {
             'user':user
             
         })

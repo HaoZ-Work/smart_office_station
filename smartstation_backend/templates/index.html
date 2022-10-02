@@ -1,0 +1,43 @@
+{% load render_bundle from webpack_loader %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie-page">
+        {% render_bundle 'app' 'css'%}
+
+
+
+    </head>
+    
+
+    <body>
+
+        <!-- <h1>Hello django</h1>
+        <h1>{{user.password}}</h1> -->
+        <script>
+        	window.user = '{{user}}'
+        </script>
+
+
+        <div id="app" ></div>
+   
+           
+            
+
+       
+
+
+
+        {% render_bundle 'app' 'js'%}
+
+    </body>
+
+
+
+
+
+</html>

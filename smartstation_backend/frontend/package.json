@@ -23,7 +23,8 @@
     "util": "^0.12.4",
     "vue": "^3.2.13",
     "vue-router": "^4.1.4",
-    "webpack": "^5.74.0"
+    "webpack": "^5.74.0",
+    "webpack-bundle-tracker": "^1.6.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

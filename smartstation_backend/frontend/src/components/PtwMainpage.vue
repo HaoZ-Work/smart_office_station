@@ -14,8 +14,8 @@
       <div class="col">
         <!-- <button type="button " class="btn btn-primary" >Station 01
         </button> -->
-        <center><h3>User01</h3>
-        <SmartStation ></SmartStation>
+        <center><h3>Welcom {{this.user}}</h3>
+        <SmartStation :user=this.user ></SmartStation>
         </center>
       <p></p>
         <!-- <center><h3>Smart Station 02</h3>
@@ -45,7 +45,10 @@ import SmartStation from './SmartStation.vue'
 
 export default {
     name: "PtwMainpage",
-    components: { SmartStation }
+    components: { SmartStation },
+    props:{
+      user:String
+    }
 }
 
 // export default Vue.component("PtwMainpage",{

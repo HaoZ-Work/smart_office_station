@@ -8,7 +8,7 @@ const routes = [
 ]
 
 const router = VueRouter.createRouter({
-
+  mode:'hash',
   history: VueRouter.createWebHashHistory(),
   routes, 
 })
