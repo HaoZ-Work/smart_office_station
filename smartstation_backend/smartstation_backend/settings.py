@@ -28,7 +28,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     '172.29.165.50',
-    '127.0.0.1'
+    '127.0.0.1',
+
 ]
 
 
@@ -152,6 +153,17 @@ WEBPACK_LOADER = {
     'POLL_INTERVAL': 0.1,
   }
 }
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' 
+EMAIL_USE_TLS= True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+
+EMAIL_HOST_USER = 'dtdysh@gmail.com'
+EMAIL_HOST_PASSWORD = 'hsxannlaobeuwole'
+
+
+
 
 
 
