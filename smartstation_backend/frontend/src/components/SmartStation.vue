@@ -69,7 +69,7 @@ export default{
       sent_request : function() {
       var config = {
       method: 'get',
-      url: 'http://127.0.0.1/api/dht22/user01/',
+      url: 'http://127.0.0.1/api/dht22/'+this.user+'/',
       headers: {}};
   
       axios(config)

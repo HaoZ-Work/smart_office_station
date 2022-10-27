@@ -1,17 +1,18 @@
 <html>
    <head>
-       <title>LoginView</title>
+       <title>Login</title>
        
    </head>
 
    <body>
 <form method="POST" action="{% url 'userdetail' %}">{% csrf_token %}
    
-<!-- form variable -->    
+<!-- form variable -->
 {{ form.as_p }} 
 
  <input type="submit" name="sumbit">
 </form>
+<p> You are using device: {{devId}}</p>
 
 <a href="http://127.0.0.1:/userpages/signup/">New to here? Please sign up.</a>
 

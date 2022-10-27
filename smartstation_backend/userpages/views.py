@@ -5,9 +5,11 @@ from django.views import generic
 # from .models import UserModel
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from .forms import NewUserForm
+from .forms import NewUserForm, LoginForm
 from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponseRedirect
+
+
 
 
 
@@ -44,7 +46,19 @@ def signup(request):
 
 class UserLogin(LoginView):
     # template_name = 'userpages/LoginView_form.html'
+    
+
     template_name = 'LoginView_form.html'
+ 
+    def get(self, request, *args, **kwargs):
+        self.devId= kwargs['devID']
+        return render(request, self.template_name, 
+        {'form': LoginForm({'DevId':self.devId}),
+        'devId':self.devId}
+        )
+    
+   
+
 
     # next_page = 'userdetail'
 
