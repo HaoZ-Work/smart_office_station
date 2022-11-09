@@ -10,6 +10,11 @@ import socket
 from machine import Pin, SoftI2C,SPI
 import ssd1306
 
+from microdot import Microdot,Response
+from microdot_utemplate import render_template,init_templates
+
+
+
 CONFIG_PATH = './config.json'
 WIFI_SETUP_TEMPLATE = './WiFi_setup.html'
 
@@ -55,20 +60,40 @@ class SmartOfficeStation():
     If the default SSID and password can not make device connect to internet, then enable AP mode and hold a website on port 80 of the device. 
     User can type SSID name and password in the website. Ths SSID and password will be saved into local file and returned.
 
-    Return:
-      ssid,password: User typed ssid and password
+
     
     '''
     ap = network.WLAN(network.AP_IF)
     ap.active(True)
     ap.config(essid='ESP32')
-    self.webserver()
+    
+    Response.default_content_type = 'text/html'
+    app=Microdot()
+    @app.route('/', methods=['GET', 'POST'])
+    def AP_index(request):
+        if request.method == 'GET':
+            return render_template('WiFi_setup.html',test='666')
+        elif request.method == 'POST':
+            ssid = request.form.get('SSID')
+            ps = request.form.get('Pass')
+            print(ssid,ps)
+            self._save_SSID(ssid,ps)
+            app.shutdown()
+            ap.active(False)
 
-    self._save_SSID("H2G","zh970201")
-    ssid,passwd = self._get_SSID()
-    return ssid,passwd
+            # return f"SSID:{ssid},pass:{ps}, server is shuting down.."
+    
+    app.run(host='0.0.0.0',port=80)
+
+
+    
   
   def _wifi_connect(self):
+    '''
+    Make the ESP32 connect to wifi net. If the SSID and password in local config.json file are not available.Then enable AP model to get SSID and pass for user side.
+
+    
+    '''
 
     sta_if = network.WLAN(network.STA_IF)
     sta_if.active(True)
@@ -78,9 +103,11 @@ class SmartOfficeStation():
     
     print('connecting to network...')
     sta_if.disconnect()
+    
     SSID,SSID_PASS=self._get_SSID()
+    print(f"The initial SSID:{SSID} and pass:{SSID_PASS}")
     sta_if.connect(SSID,SSID_PASS)
-    time.sleep(5)
+    time.sleep(3)
 
     if not sta_if.isconnected():
 
@@ -88,11 +115,16 @@ class SmartOfficeStation():
           
       print("Enable Ap model")
           
-      sta_if.active(True)
 
-      new_SSID,new_SSID_PASS=self._wifi_setup()
+      self._wifi_setup()
+
       sta_if.disconnect()
+      new_SSID,new_SSID_PASS=self._get_SSID()
+      print(f"The  new SSID:{new_SSID} and pass:{new_SSID_PASS}")
+
       sta_if.connect(new_SSID,new_SSID_PASS)
+      time.sleep(3)
+
     
     while sta_if.isconnected()!=True:
       print("Connecting...")
@@ -138,6 +170,18 @@ class SmartOfficeStation():
         cl.send(response)
         cl.close()
   
+
+  def server(self):
+    app=Microdot()
+
+    @app.route('/', methods=['GET', 'POST'])
+    def server_index(request):
+        if request.method == 'GET':
+            return render_template('index.html',sensor_data={'key':'value'})
+       
+    print("Running server..")
+    app.run(host='0.0.0.0',port=80)
+
   def _oled_init(self):
     i2c = SoftI2C(scl=Pin(22), sda=Pin(21))
     oled_width = 128
@@ -151,10 +195,52 @@ class SmartOfficeStation():
 
 
 def main():
+  Response.default_content_type = 'text/html'
 
-   smartoffice = SmartOfficeStation()
-  #  smartoffice.webserver()
+
+  smartoffice = SmartOfficeStation()
+  #smartoffice.server()
+  # sta_if = network.WLAN(network.STA_IF)
+  # sta_if.active(True)
+
+  # sta_if.config(reconnects=-1)
+
+    
+  # print('connecting to network...')
+  # sta_if.disconnect()
+  # SSID = 'H2G'
+  # SSID_PASS='zh970201'
+  # sta_if.connect(SSID,SSID_PASS)
+  # time.sleep(5)
+
+  # app=Microdot()
+  # # @app.get('/')
+  # # def index(request):
+  # #   # return 'Hello, world!'
+
+  # #   return render_template('WiFi_setup.html',test='666')
   
+  # # @app.post('/post')
+  # # def post(request):
+  # #   # return 'Hello, world!'
+  # #   ssid = request.form.get('SSID')
+  # #   ps = request.form.get('Pass')
+  # #   print(ssid,ps)
+
+  # #   return f'{ssid,ps}'
+  # @app.route('/', methods=['GET', 'POST'])
+  # def index(request):
+  #     if request.method == 'GET':
+  #         return render_template('WiFi_setup.html',test='666')
+  #     elif request.method == 'POST':
+  #         ssid = request.form.get('SSID')
+  #         ps = request.form.get('Pass')
+  #         print(ssid,ps)
+  #         app.shutdown()
+  #         return f"SSID:{ssid},pass:{ps}, server is shuting down.."
+  
+  # app.run()
+  # print('SSID done!')
 
 if __name__ == '__main__':
   main()
