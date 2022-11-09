@@ -13,7 +13,7 @@ import ssd1306
 from microdot import Microdot,Response
 from microdot_utemplate import render_template,init_templates
 
-
+DHT_DATA_PIN = 14
 
 CONFIG_PATH = './config.json'
 WIFI_SETUP_TEMPLATE = './WiFi_setup.html'
@@ -23,6 +23,7 @@ class SmartOfficeStation():
   def __init__(self) -> None:
      self._oled_init()
      self._wifi_connect()
+     self._dht_init()
 
   
   def _save_SSID(self,ssid,passwd):
@@ -86,7 +87,6 @@ class SmartOfficeStation():
     app.run(host='0.0.0.0',port=80)
 
 
-    
   
   def _wifi_connect(self):
     '''
@@ -134,6 +134,10 @@ class SmartOfficeStation():
     self.oled.text(f"{sta_if.ifconfig()[0]}",0,30)
     self.oled.show()
 
+  def _dht_init(self):
+    self.dht = dht.DHT22(machine.Pin(DHT_DATA_PIN))
+
+  
   def webserver(self):
     # html = """<!DOCTYPE html>
     # <html>
@@ -177,7 +181,14 @@ class SmartOfficeStation():
     @app.route('/', methods=['GET', 'POST'])
     def server_index(request):
         if request.method == 'GET':
-            return render_template('index.html',sensor_data={'key':'value'})
+          
+            self.dht.measure()
+            return render_template('index.html',sensor_data=
+            {'key':'value',
+            'temperature':self.dht.temperature(),
+            'humidity':self.dht.humidity(),
+            }
+            )
        
     print("Running server..")
     app.run(host='0.0.0.0',port=80)
@@ -199,7 +210,7 @@ def main():
 
 
   smartoffice = SmartOfficeStation()
-  #smartoffice.server()
+  smartoffice.server()
   # sta_if = network.WLAN(network.STA_IF)
   # sta_if.active(True)
 
