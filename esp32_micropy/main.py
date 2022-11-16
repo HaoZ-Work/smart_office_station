@@ -146,41 +146,41 @@ class SmartOfficeStation():
     self.dht = dht.DHT22(machine.Pin(DHT_DATA_PIN))
 
   
-  def webserver(self):
-    # html = """<!DOCTYPE html>
-    # <html>
-    #     <head> <title>ESP8266 Pins</title> </head>
-    #     <body> <h1>ESP8266 Pins</h1>
-    #         <p>Hello!</p>
-    #     </body>
-    # </html>
-    # """
-    with open(WIFI_SETUP_TEMPLATE,'r') as f:
-      html = f.read()
-    print(html)
-    addr = socket.getaddrinfo('0.0.0.0', 80)[0][-1]
-    # 192.168.1.1:80
-    # 192.168.1.1:80/setup_wifi.html
+  # def webserver(self):
+  #   # html = """<!DOCTYPE html>
+  #   # <html>
+  #   #     <head> <title>ESP8266 Pins</title> </head>
+  #   #     <body> <h1>ESP8266 Pins</h1>
+  #   #         <p>Hello!</p>
+  #   #     </body>
+  #   # </html>
+  #   # """
+  #   with open(WIFI_SETUP_TEMPLATE,'r') as f:
+  #     html = f.read()
+  #   print(html)
+  #   addr = socket.getaddrinfo('0.0.0.0', 80)[0][-1]
+  #   # 192.168.1.1:80
+  #   # 192.168.1.1:80/setup_wifi.html
     
-    s = socket.socket()
+  #   s = socket.socket()
     
-    s.bind(addr)
-    s.listen(1)
+  #   s.bind(addr)
+  #   s.listen(1)
 
-    print('listening on', addr)
-    while True:
-        cl, addr = s.accept()
-        print('client connected from', addr)
-        cl_file = cl.makefile('rwb', 0)
-        while True:
-            line = cl_file.readline()
-            if not line or line == b'\r\n':
-                break
+  #   print('listening on', addr)
+  #   while True:
+  #       cl, addr = s.accept()
+  #       print('client connected from', addr)
+  #       cl_file = cl.makefile('rwb', 0)
+  #       while True:
+  #           line = cl_file.readline()
+  #           if not line or line == b'\r\n':
+  #               break
         
-        response = html 
-        cl.send('HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n')
-        cl.send(response)
-        cl.close()
+  #       response = html 
+  #       cl.send('HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n')
+  #       cl.send(response)
+  #       cl.close()
   
 
   def server(self):
@@ -191,12 +191,18 @@ class SmartOfficeStation():
         if request.method == 'GET':
           
             self.dht.measure()
-            return render_template('index.html',sensor_data=
-            {'key':'value',
-            'temperature':self.dht.temperature(),
-            'humidity':self.dht.humidity(),
-            }
-            )
+            return render_template('index.html')
+
+    @app.route('/dht22', methods=['GET'])
+    def dht_enterpoint(request):
+      self.dht.measure()
+      dht_data = {
+        'temperature':self.dht.temperature(),
+        'humidity':self.dht.humidity(),
+
+      }
+      return dht_data
+
        
     print("Running server..")
     app.run(host='0.0.0.0',port=80)
