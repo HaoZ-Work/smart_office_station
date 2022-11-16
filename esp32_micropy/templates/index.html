@@ -1,26 +1,116 @@
-{% args sensor_data %}
+
 
 <html>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="http://requirejs.org/docs/release/2.3.2/comments/require.js"></script>
+
+
+
+
 
 <head>
-    <meta http-equiv="refresh" content="5">
+    <!-- <meta http-equiv="refresh" content="5"> -->
 <title>SmartOfficeStation</title>
 </head>
 
 <body>
 <!-- <p>body </p> -->
 
-<!-- <p>sensor: {{sensor_data}} </p> -->
-
-
-
 
 
 
 <p>dht data:</p>
-<p>vtemperature: {{sensor_data['temperature']}}</p>
-<p>humidity: {{sensor_data['humidity']}}</p>
+<p id="temp">temperature: </p>
+<p id="humi">humidity:</p>
+<div id="app">
 
+</div>
 </body>
 
 </html>
+
+
+
+<script>
+
+const app = Vue.createApp({
+
+    data() {
+      return {
+   
+        temp:0,
+        humi:0
+      }
+    },
+    methods:{
+        // getNetworkIp(){
+        //     let network = os.networkInterfaces();
+        //     console.log(network);
+        // },
+
+        QueryData(enter_point){
+            var config = {
+          
+            method: 'get',
+            url: 'http://192.168.50.197/'+enter_point,
+            // TODO: How to get the local ip here?
+            headers: {} };
+        
+            axios(config)
+                .then(function (response) {
+                    // console.log(response.data);
+                
+                    this.temp=response.data['temperature']
+                    this.humi=response.data['humidity']
+                
+                    
+                }.bind(this))
+                .catch(function (error) {
+                console.log(error);
+                });
+        },
+        dht22_update() {
+            this.QueryData('dht22')
+            document.getElementById("temp").innerHTML="temperature:"+this.temp;
+            document.getElementById("humi").innerHTML="humidity:"+this.humi;
+
+        },
+        // m2() {
+        //     document.getElementById("humi").innerHTML='M2!';
+        // },
+        sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+        },
+         auto_update:async function()  {
+            var T= true
+            while (T){
+                this.dht22_update()
+                await this.sleep(3000)
+           
+
+            }
+            
+        }
+
+    },
+    mounted(){
+        this.auto_update()
+       
+    }
+
+})
+
+
+
+// app.component('runoob', {
+//     template: '<h1>Components!</h1>'
+// })
+
+
+app.mount('#app')
+
+
+</script>
+
+
