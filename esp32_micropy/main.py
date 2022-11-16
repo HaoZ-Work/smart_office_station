@@ -10,13 +10,14 @@ import socket
 from machine import Pin, SoftI2C,SPI
 import ssd1306
 
-from microdot import Microdot,Response
+from microdot import Microdot,Response,send_file
 from microdot_utemplate import render_template,init_templates
 
 DHT_DATA_PIN = 14
+# DEV_ID = 000001
 
 CONFIG_PATH = './config.json'
-WIFI_SETUP_TEMPLATE = './WiFi_setup.html'
+# WIFI_SETUP_TEMPLATE = './WiFi_setup.html'
 
 
 class SmartOfficeStation():
@@ -83,6 +84,13 @@ class SmartOfficeStation():
             ap.active(False)
 
             # return f"SSID:{ssid},pass:{ps}, server is shuting down.."
+    
+    @app.route('/src/<path:path>')
+    def static(request, path):
+        if '..' in path:
+            # directory traversal is not allowed
+            return 'Not found', 404
+        return send_file('src/' + path)
     
     app.run(host='0.0.0.0',port=80)
 
