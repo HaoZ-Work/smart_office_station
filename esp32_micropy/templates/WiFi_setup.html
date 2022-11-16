@@ -1,19 +1,52 @@
-{% args test %}
 <!DOCTYPE html>
 <html>
 <head> 
 <meta charset="utf-8"> 
-<title>WiFi</title> 
+<title>WiFi</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 
+    <div class="container ">
+        <hr size=20 color=#b90f22> <hr size=4 color=#000000>
+        <center><img src='../src/PTW_Logo.png' width=140 height=92 ></center> 
+        <hr size=20 color=#b90f22> <hr size=4 color=#000000>
+      </div>
+      
 
-    <!-- <p>test={{test}}</p> -->
+<div class="container-fluid">
+    <center>
+        <form action="/" method="post">
+            <div class="mb-3 mt-3">
+                <label for="SSID" class="form-label">SSID Name</label><br>
+                <input type="text" placeholder="Name of SSID" name="SSID">
+              </div>
+            <div class="mb-3 mt-3">
+                <label for="SSID Pass" class="form-label">SSID Password</label><br>
+                <input type="text" placeholder="Password of SSID" name="Pass">
+              </div>
+            <!-- <div>
+                <p>SSID Name</p>
+            <input type="text" name="SSID" value=""><br>
+            </div>
+            
+            <p>SSID Password</p>
+            <input type="text" name="Pass" value=""><br>
+            <p></p> -->
+            <input type="submit" value="Connect">
+            </form>
+    </center>
+   
+        
+</div>
 
-<form action="/" method="post">
-SSID Name: <input type="text" name="SSID" value=""><br>
-SSID Password: <input type="text" name="Pass" value=""><br>
-<input type="submit" value="Connect">
-</form>
+
+
+
+
 </body>
+
+
 </html>
