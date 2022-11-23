@@ -1,9 +1,7 @@
-
-
+{% args ip %}
 <html>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script src="http://requirejs.org/docs/release/2.3.2/comments/require.js"></script>
 
 
 
@@ -12,20 +10,48 @@
 <head>
     <!-- <meta http-equiv="refresh" content="5"> -->
 <title>SmartOfficeStation</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
 </head>
 
 <body>
 <!-- <p>body </p> -->
+<div class="container ">
+    <hr size=20 color=#b90f22> <hr size=4 color=#000000>
+    <center><img src='https://www.ptw.tu-darmstadt.de/media/fachgebietptw/grafikenundfotos/logos_2/PTW-Logo.png' width=140 height=92></center> 
+    <hr size=20 color=#b90f22> <hr size=4 color=#000000>
+  </div>
+
+    <p id="ip" hidden>{{ip}}</p>
+
+  
+  <div id="app" class="container mt-3">
+    <h1>Sensor Data</h1>
+    <table class="table">
+      <thead>
+        <tr>
+          
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td >Dht22 sensor</td>
+          <td  >
+            <p id="temp">temperature: </p>
+            <p id="humi">humidity:</p>
+        </td>
+  
+        </tr>
+
+      
+
+      </tbody>
+    </table>
+    </div>
 
 
-
-
-<p>dht data:</p>
-<p id="temp">temperature: </p>
-<p id="humi">humidity:</p>
-<div id="app">
-
-</div>
 </body>
 
 </html>
@@ -40,21 +66,21 @@ const app = Vue.createApp({
       return {
    
         temp:0,
-        humi:0
+        humi:0,
+        ip:''
       }
     },
     methods:{
-        // getNetworkIp(){
-        //     let network = os.networkInterfaces();
-        //     console.log(network);
-        // },
+        getNetworkIp(){
+            this.ip=document.getElementById("ip").innerText
+            console.log(this.ip)
+        },
 
         QueryData(enter_point){
             var config = {
           
             method: 'get',
-            url: 'http://192.168.50.197/'+enter_point,
-            // TODO: How to get the local ip here?
+            url: 'http://'+this.ip+'/'+enter_point,
             headers: {} };
         
             axios(config)
@@ -95,6 +121,7 @@ const app = Vue.createApp({
 
     },
     mounted(){
+        this.getNetworkIp()
         this.auto_update()
        
     }
