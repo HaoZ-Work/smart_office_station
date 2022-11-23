@@ -138,6 +138,7 @@ class SmartOfficeStation():
       print("Connecting...")
       print(sta_if.isconnected())
     print('network config:', sta_if.ifconfig())
+    self.netconfig = sta_if.ifconfig()
     self.oled.text("WiFi connected.",0,20)
     self.oled.text(f"{sta_if.ifconfig()[0]}",0,30)
     self.oled.show()
@@ -191,7 +192,7 @@ class SmartOfficeStation():
         if request.method == 'GET':
           
             self.dht.measure()
-            return render_template('index.html')
+            return render_template('index.html',ip=self.netconfig[0])
 
     @app.route('/dht22', methods=['GET'])
     def dht_enterpoint(request):
@@ -202,6 +203,14 @@ class SmartOfficeStation():
 
       }
       return dht_data
+    
+    # @app.route('/ifconfig', methods=['GET'])
+    # def netconfig_enterpoint(request):
+    #   netconfig = {
+    #     'ip':self.netconfig[0]
+
+    #   }
+    #   return netconfig
 
        
     print("Running server..")
