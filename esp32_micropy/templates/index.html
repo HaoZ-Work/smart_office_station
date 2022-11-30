@@ -2,6 +2,8 @@
 <html>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.3.3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-echarts@6.2.3"></script>
 
 
 
@@ -17,7 +19,6 @@
 </head>
 
 <body>
-<!-- <p>body </p> -->
 <div class="container ">
     <hr size=20 color=#b90f22> <hr size=4 color=#000000>
     <center><img src='https://www.ptw.tu-darmstadt.de/media/fachgebietptw/grafikenundfotos/logos_2/PTW-Logo.png' width=140 height=92></center> 
@@ -28,8 +29,9 @@
 
   
   <div id="app" class="container mt-3">
+
     <h1>Sensor Data</h1>
-    <table class="table">
+    <table hidden class="table">
       <thead>
         <tr>
           
@@ -41,6 +43,7 @@
           <td  >
             <p id="temp">temperature: </p>
             <p id="humi">humidity:</p>
+            
         </td>
   
         </tr>
@@ -49,6 +52,20 @@
 
       </tbody>
     </table>
+    <div class="container-fluid"> 
+      <div class="row">
+        <div class="col-md-6"  style="width: 400px;height:400px;">
+          <v-chart  :option="temp_option" />
+        </div>
+
+        <div class="col-md-6"  style="width: 400px;height:400px;">
+          <v-chart  :option="humi_option" />
+        </div>
+
+      </div>
+    </div>
+
+
     </div>
 
 
@@ -67,8 +84,44 @@ const app = Vue.createApp({
    
         temp:0,
         humi:0,
-        ip:''
-      }
+        ip:'',
+        temp_option:{
+          // width: 8000,
+          // height: 4000,
+
+          series:[
+            {
+              type:'gauge',
+              detail:{
+                formatter:'{value}°C'
+              },
+              // min:-30,
+              max:50,
+              data:[{
+                value:this.temp,
+                name:"temperature"
+              }]
+            }
+
+          ]
+        },
+        humi_option:{
+          series:[
+            {
+              type:'gauge',
+              detail:{
+                formatter:'{value}%'
+              },
+              data:[{
+                value:this.humi,
+                name:"humidity"
+              }]
+            }
+
+          ]
+        },
+
+     }
     },
     methods:{
         getNetworkIp(){
@@ -100,6 +153,9 @@ const app = Vue.createApp({
             this.QueryData('dht22')
             document.getElementById("temp").innerHTML="temperature:"+this.temp;
             document.getElementById("humi").innerHTML="humidity:"+this.humi;
+        
+            this.humi_option['series'][0]['data'][0]['value']=this.humi
+            this.temp_option['series'][0]['data'][0]['value']=this.temp
 
         },
         // m2() {
@@ -134,7 +190,7 @@ const app = Vue.createApp({
 //     template: '<h1>Components!</h1>'
 // })
 
-
+app.component('v-chart', VueECharts)
 app.mount('#app')
 
 
