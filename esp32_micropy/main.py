@@ -10,7 +10,11 @@ import socket
 from machine import Pin, SoftI2C,SPI
 import ssd1306
 
-from microdot import Microdot,Response,send_file
+from microdot import Microdot, Response,send_file
+import uasyncio as asyncio
+
+from microdot_asyncio import Microdot as async_Microdot
+
 from microdot_utemplate import render_template,init_templates
 
 
@@ -79,7 +83,7 @@ class SmartOfficeStation():
     @app.route('/', methods=['GET', 'POST'])
     def AP_index(request):
         if request.method == 'GET':
-            return render_template('WiFi_setup.html',test='666')
+            return render_template('WiFi_setup.html',test='test')
         elif request.method == 'POST':
             ssid = request.form.get('SSID')
             ps = request.form.get('Pass')
@@ -105,7 +109,7 @@ class SmartOfficeStation():
 
     self.oled.show()
 
-    app.run(host='0.0.0.0',port=80)
+    app.run(host='0.0.0.0',port=80,debug=True)
 
 
   
@@ -221,17 +225,17 @@ class SmartOfficeStation():
   
 
   def server(self):
-    app=Microdot()
+    app=async_Microdot()
 
     @app.route('/', methods=['GET', 'POST'])
-    def server_index(request):
+    async def server_index(request):
         if request.method == 'GET':
           
             # self.dht.measure() ## TODO: keep updating even without web user?
             return render_template('index.html',ip=self.netconfig[0])
 
     @app.route('/dht22', methods=['GET'])
-    def dht_enterpoint(request):
+    async def dht_enterpoint(request):
       self.dht.measure()
       self.oled.fill(0)
       if self.SHOW_NET_CONFIG==True:
@@ -262,7 +266,12 @@ class SmartOfficeStation():
     self.oled.show()
     print("Running server..")
     self.SERVER_RUNNING=True
-    app.run(host='0.0.0.0',port=80)
+
+    # async def start_async_server():
+    #   await app.start_server(host='0.0.0.0',port=80,debug=True)
+
+    # asyncio.run(start_async_server())
+    app.run(host='0.0.0.0',port=80,debug=True)
     
 
   def _oled_init(self):
