@@ -13,8 +13,6 @@ import ssd1306
 from microdot import Microdot,Response,send_file
 from microdot_utemplate import render_template,init_templates
 
-DHT_DATA_PIN = 14
-# DEV_ID = 000001
 
 CONFIG_PATH = './config.json'
 # WIFI_SETUP_TEMPLATE = './WiFi_setup.html'
@@ -22,10 +20,19 @@ CONFIG_PATH = './config.json'
 
 class SmartOfficeStation():
   def __init__(self) -> None:
+     self._load_config()
      self._oled_init()
      self._wifi_connect()
      self._dht_init()
 
+  def _load_config(self):
+    '''
+    Load configuration from config.json.Check the config.json for more details.
+
+    '''
+    with open(CONFIG_PATH,"r") as config_file:
+      self.config = ujson.load(config_file)
+    print(self.config)
   
   def _save_SSID(self,ssid,passwd):
     '''
@@ -34,12 +41,10 @@ class SmartOfficeStation():
     '''
 
     with open(CONFIG_PATH,"w") as dump_file:
-      ssid_config={
-        "SSID":ssid,
-        "SSID_PASS":passwd
-      }
-       
-      ujson.dump(ssid_config,dump_file)
+      self.config["SSID"] = ssid
+      self.config["SSID_PASS"]=passwd
+
+      ujson.dump(self.config,dump_file)
     
 
   def _get_SSID(self):
@@ -48,11 +53,11 @@ class SmartOfficeStation():
     
     '''
     with open(CONFIG_PATH,"r") as config_file:
-      config = ujson.load(config_file)
+      self.config = ujson.load(config_file)
       # print(config)
 
-    ssid = config['SSID']
-    passwd = config['SSID_PASS']
+    ssid = self.config['SSID']
+    passwd = self.config['SSID_PASS']
     
     return ssid,passwd
     
@@ -67,7 +72,7 @@ class SmartOfficeStation():
     '''
     ap = network.WLAN(network.AP_IF)
     ap.active(True)
-    ap.config(essid='ESP32')
+    ap.config(essid='ESP32_'+self.config["DEV_ID"])
     
     Response.default_content_type = 'text/html'
     app=Microdot()
@@ -95,6 +100,9 @@ class SmartOfficeStation():
     ap_netgate = ap.ifconfig()[0]
     self.oled.text(f"Set Wifi here:",0,20)
     self.oled.text(f"{ap_netgate}",0,30)
+    ap_name = "ESP32_"+self.config["DEV_ID"]
+    self.oled.text(f"in {ap_name}",0,40)
+
     self.oled.show()
 
     app.run(host='0.0.0.0',port=80)
@@ -140,6 +148,7 @@ class SmartOfficeStation():
 
     
     while sta_if.isconnected()!=True:
+      #TODO: what if user type a unavailable ssid at the first time?
       print("Connecting...")
       print(sta_if.isconnected())
     print('network config:', sta_if.ifconfig())
@@ -151,7 +160,8 @@ class SmartOfficeStation():
     self.oled.show()
 
   def _dht_init(self):
-    self.dht = dht.DHT22(machine.Pin(DHT_DATA_PIN))
+    # print(self.config)
+    self.dht = dht.DHT22(machine.Pin(self.config["DHT_DATA_PIN"]))
 
   
   # def webserver(self):
@@ -198,7 +208,7 @@ class SmartOfficeStation():
     def server_index(request):
         if request.method == 'GET':
           
-            # self.dht.measure()
+            # self.dht.measure() ## TODO: keep updating even without web user?
             return render_template('index.html',ip=self.netconfig[0])
 
     @app.route('/dht22', methods=['GET'])
@@ -237,9 +247,9 @@ class SmartOfficeStation():
     
 
   def _oled_init(self):
-    i2c = SoftI2C(scl=Pin(22), sda=Pin(21))
-    oled_width = 128
-    oled_height = 64
+    i2c = SoftI2C(scl=Pin(self.config["OLED_SCL"]), sda=Pin(self.config["OLED_SDA"]))
+    oled_width = self.config["OLED_WIDTH"]
+    oled_height = self.config["OLED_HEIGHT"]
     oled = ssd1306.SSD1306_I2C(oled_width, oled_height, i2c)
     self.oled = oled
     # oled.text("Connecting...",0,0)
