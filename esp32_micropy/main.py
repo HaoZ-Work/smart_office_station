@@ -92,6 +92,11 @@ class SmartOfficeStation():
             return 'Not found', 404
         return send_file('src/' + path)
     
+    ap_netgate = ap.ifconfig()[0]
+    self.oled.text(f"Set Wifi here:",0,20)
+    self.oled.text(f"{ap_netgate}",0,30)
+    self.oled.show()
+
     app.run(host='0.0.0.0',port=80)
 
 
@@ -139,8 +144,10 @@ class SmartOfficeStation():
       print(sta_if.isconnected())
     print('network config:', sta_if.ifconfig())
     self.netconfig = sta_if.ifconfig()
-    self.oled.text("WiFi connected.",0,20)
-    self.oled.text(f"{sta_if.ifconfig()[0]}",0,30)
+    self.oled.fill(0)
+    self.SHOW_NET_CONFIG=True
+    self.oled.text("WiFi connected.",0,0)
+    self.oled.text(f"{self.netconfig[0]}",0,20)
     self.oled.show()
 
   def _dht_init(self):
@@ -191,12 +198,22 @@ class SmartOfficeStation():
     def server_index(request):
         if request.method == 'GET':
           
-            self.dht.measure()
+            # self.dht.measure()
             return render_template('index.html',ip=self.netconfig[0])
 
     @app.route('/dht22', methods=['GET'])
     def dht_enterpoint(request):
       self.dht.measure()
+      self.oled.fill(0)
+      if self.SHOW_NET_CONFIG==True:
+            self.oled.text("WiFi connected.",0,0)
+            self.oled.text(f"{self.netconfig[0]}",0,20)
+      if self.SERVER_RUNNING==True:
+            self.oled.text("Server is on:",0,10)
+
+      self.oled.text(f"temp:{self.dht.temperature()}C",0,30)
+      self.oled.text(f"hudi:{self.dht.humidity()}%",0,40)
+      self.oled.show()
       dht_data = {
         'temperature':self.dht.temperature(),
         'humidity':self.dht.humidity(),
@@ -212,9 +229,12 @@ class SmartOfficeStation():
     #   }
     #   return netconfig
 
-       
+    self.oled.text("Server is on:",0,10)
+    self.oled.show()
     print("Running server..")
+    self.SERVER_RUNNING=True
     app.run(host='0.0.0.0',port=80)
+    
 
   def _oled_init(self):
     i2c = SoftI2C(scl=Pin(22), sda=Pin(21))
