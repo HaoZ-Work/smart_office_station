@@ -146,11 +146,30 @@ class SmartOfficeStation():
       sta_if.connect(new_SSID,new_SSID_PASS)
       time.sleep(3)
 
-    
-    while sta_if.isconnected()!=True:
-      #TODO: what if user type a unavailable ssid at the first time?
+      max_attempts = 0
+    while sta_if.isconnected()!=True and max_attempts<200:
+      
+      max_attempts+=1
+      print(max_attempts)
       print("Connecting...")
       print(sta_if.isconnected())
+    # print(sta_if.ifconfig()[0])
+    # print(sta_if.isconnected())
+    if sta_if.isconnected()==False:
+      ## if user type a unavailable ssid, this will let them restart the device and try again
+      self.oled.fill(0)
+      unavailable_ssid = self.config["SSID"]
+      self.oled.text(f"SSID:{unavailable_ssid}",0,0)
+      self.oled.text(f"isn't available",0,10)
+      self.oled.text(f"Please restart ",0,20)
+      self.oled.text(f"the device and",0,30)
+      self.oled.text(f"try again",0,40)
+      self.oled.show()
+
+      assert False, "Wifi is not available."
+
+
+
     print('network config:', sta_if.ifconfig())
     self.netconfig = sta_if.ifconfig()
     self.oled.fill(0)
