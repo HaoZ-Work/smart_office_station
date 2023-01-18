@@ -187,42 +187,7 @@ class SmartOfficeStation():
     self.dht = dht.DHT22(machine.Pin(self.config["DHT_DATA_PIN"]))
 
   
-  # def webserver(self):
-  #   # html = """<!DOCTYPE html>
-  #   # <html>
-  #   #     <head> <title>ESP8266 Pins</title> </head>
-  #   #     <body> <h1>ESP8266 Pins</h1>
-  #   #         <p>Hello!</p>
-  #   #     </body>
-  #   # </html>
-  #   # """
-  #   with open(WIFI_SETUP_TEMPLATE,'r') as f:
-  #     html = f.read()
-  #   print(html)
-  #   addr = socket.getaddrinfo('0.0.0.0', 80)[0][-1]
-  #   # 192.168.1.1:80
-  #   # 192.168.1.1:80/setup_wifi.html
-    
-  #   s = socket.socket()
-    
-  #   s.bind(addr)
-  #   s.listen(1)
 
-  #   print('listening on', addr)
-  #   while True:
-  #       cl, addr = s.accept()
-  #       print('client connected from', addr)
-  #       cl_file = cl.makefile('rwb', 0)
-  #       while True:
-  #           line = cl_file.readline()
-  #           if not line or line == b'\r\n':
-  #               break
-        
-  #       response = html 
-  #       cl.send('HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n')
-  #       cl.send(response)
-  #       cl.close()
-  
 
   def server(self):
     app=async_Microdot()
@@ -253,6 +218,7 @@ class SmartOfficeStation():
 
       }
       return dht_data
+  
     
     # @app.route('/ifconfig', methods=['GET'])
     # def netconfig_enterpoint(request):

@@ -21,7 +21,8 @@
 <body>
 <div class="container ">
     <hr size=20 color=#b90f22> <hr size=4 color=#000000>
-    <center><img src='https://www.ptw.tu-darmstadt.de/media/fachgebietptw/grafikenundfotos/logos_2/PTW-Logo.png' width=140 height=92></center> 
+    <center><img src='https://www.ptw.tu-darmstadt.de/media/fachgebietptw/grafikenundfotos/logos_2/PTW_Logo.de.svg'  ></center> 
+ 
     <hr size=20 color=#b90f22> <hr size=4 color=#000000>
   </div>
 
@@ -62,11 +63,21 @@
           <v-chart  :option="humi_option" />
         </div>
 
+        
+        <div class="col-md-6"  style="width: 8000px;height:400px;">
+          <v-chart  :option="lineChartTempOption" />
+        </div>
+          
+   
+        
+        <!-- <button :onclick="addOneData">add one point</button> -->
+
+
       </div>
     </div>
 
 
-    </div>
+  </div>
 
 
 </body>
@@ -85,6 +96,24 @@ const app = Vue.createApp({
         temp:0,
         humi:0,
         ip:'',
+        weekday:[
+          "Sun",
+          "Mon",
+          "Tues",
+          "Wed",
+          "Thur",
+          "Fri",
+          "Sat"
+        ],
+        weekdayColor:[
+          "gray",
+          "green",
+          "red",
+          "blue",
+          "yellow",
+          "purple",
+          "gray"
+        ],
         temp_option:{
           // width: 8000,
           // height: 4000,
@@ -120,7 +149,31 @@ const app = Vue.createApp({
 
           ]
         },
+        lineChartTempOption:{
+          xAxis: {
+            type: 'category',
+            data: []
+          },
+          yAxis: {
+            type: 'value',
+            name: 'Temperature',
+            min: 0,
+            max: 40,
+            position: 'left',
+            axisLabel: {
+              formatter: '{value} °C'
+              }
+            },
+          series: [
+            {
+              data: [],
+              color:'black',
+              type: 'line',
+              smooth: true,
 
+    }
+  ]
+}
      }
     },
     methods:{
@@ -142,6 +195,9 @@ const app = Vue.createApp({
                 
                     this.temp=response.data['temperature']
                     this.humi=response.data['humidity']
+                    console.log(this.temp)
+                    console.log("dht data updated!")
+
                 
                     
                 }.bind(this))
@@ -149,46 +205,103 @@ const app = Vue.createApp({
                 console.log(error);
                 });
         },
-        dht22_update() {
-            this.QueryData('dht22')
+        dht22Update(mode) {
+          // mode: choose which part should be update
+          this.QueryData('dht22')
+          if (mode!='beforemount')
+          {
             document.getElementById("temp").innerHTML="temperature:"+this.temp;
             document.getElementById("humi").innerHTML="humidity:"+this.humi;
-        
+          }
+      
+          newDate = new Date()
+
+          if (mode=='gauge' ||mode=='beforemount' )
+          {
             this.humi_option['series'][0]['data'][0]['value']=this.humi
             this.temp_option['series'][0]['data'][0]['value']=this.temp
+            console.log('gauge:'+newDate.getSeconds() )
 
-        },
+          }
+          if(mode=='category'||mode=='beforemount')
+          {
+
+            this.lineChartTempOption.series[0].data.push(this.temp)
+            this.lineChartTempOption.xAxis.data.push(this.weekday[newDate.getDay()] +' '+String(newDate.getHours())+':'+String(newDate.getMinutes()))
+            
+            this.lineChartTempOption.series[0].color=this.weekdayColor[newDate.getDay()]
+
+          }
+        
+
+          },
         // m2() {
         //     document.getElementById("humi").innerHTML='M2!';
         // },
         sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
         },
-         auto_update:async function()  {
+        UpdateGauge:async function(freq)  {
             var T= true
             while (T){
-                this.dht22_update()
-                await this.sleep(3000)
-           
+                this.dht22Update('gauge')
+                await this.sleep(freq)
+          
+            }
+            
+        },
+        UpdateCategory:async function(freq)  {
+            var T= true
+            while (T){
+              this.dht22Update('category')
+                await this.sleep(freq)
+                console.log("running")
 
             }
             
-        }
+        },
+        addOneData() {
+          let n = 5
+          let day = 0
+          newPoint = 40*Math.random()
+          
+     
+            while (n>0){
+              newDate = new Date()
 
+              newPoint = 40*Math.random()
+              newDay = Math.round(7*Math.random())
+
+              this.lineChartTempOption.series[0].data.push(newPoint)
+              this.lineChartTempOption.xAxis.data.push(this.weekday[newDay] +' '+String(newDate.getHours())+':'+String(newDate.getMinutes()))
+              this.lineChartTempOption.series[0].color=this.weekdayColor[newDay]
+              n--
+              console.log(n)
+
+            }
+            // console.log(day)
+            
+          
+
+
+          console.log(newDate)
+        }
     },
     mounted(){
         this.getNetworkIp()
-        this.auto_update()
+        this.UpdateGauge(3000)
+        this.UpdateCategory(60000) //1800000 for 30 mins
        
-    }
+    },
+    // beforeMount(){
+    //   this.dht22Update('beforemount')
+
+    // }
 
 })
 
 
 
-// app.component('runoob', {
-//     template: '<h1>Components!</h1>'
-// })
 
 app.component('v-chart', VueECharts)
 app.mount('#app')
