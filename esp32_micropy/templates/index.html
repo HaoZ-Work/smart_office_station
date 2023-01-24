@@ -21,7 +21,7 @@
 <body>
 <div class="container ">
     <hr size=20 color=#b90f22> <hr size=4 color=#000000>
-    <center><img src='https://www.ptw.tu-darmstadt.de/media/fachgebietptw/grafikenundfotos/logos_2/PTW_Logo.de.svg'  ></center> 
+    <center><img src='https://www.ptw.tu-darmstadt.de/media/fachgebietptw/grafikenundfotos/logos_2/PTW_Logo.svg'  ></center> 
  
     <hr size=20 color=#b90f22> <hr size=4 color=#000000>
   </div>
@@ -182,7 +182,7 @@ const app = Vue.createApp({
             console.log(this.ip)
         },
 
-        QueryData(enter_point){
+        QueryData(enter_point,){
             var config = {
           
             method: 'get',
@@ -205,19 +205,49 @@ const app = Vue.createApp({
                 console.log(error);
                 });
         },
+        DumpData(enter_point,data){
+            var config = {
+          
+            method: 'post',
+            url: 'http://'+this.ip+'/'+enter_point+'/'+'dump',
+            headers: {},
+            data :data
+
+
+          };
+        
+            axios(config)
+                .then(function (response) {
+                    // console.log(response.data);
+                
+                    this.temp=response.data['temperature']
+                    this.humi=response.data['humidity']
+                    console.log(this.temp)
+                    console.log("dht data updated!")
+
+                
+                    
+                }.bind(this))
+                .catch(function (error) {
+                console.log(error);
+                });
+        },
+ 
         dht22Update(mode) {
           // mode: choose which part should be update
-          this.QueryData('dht22')
-          if (mode!='beforemount')
-          {
-            document.getElementById("temp").innerHTML="temperature:"+this.temp;
-            document.getElementById("humi").innerHTML="humidity:"+this.humi;
-          }
+          // this.QueryData('dht22')
+          // if (mode!='beforemount')
+          // {
+          //   document.getElementById("temp").innerHTML="temperature:"+this.temp;
+          //   document.getElementById("humi").innerHTML="humidity:"+this.humi;
+          // }
       
           newDate = new Date()
 
           if (mode=='gauge' ||mode=='beforemount' )
           {
+            this.QueryData('dht22')
+
             this.humi_option['series'][0]['data'][0]['value']=this.humi
             this.temp_option['series'][0]['data'][0]['value']=this.temp
             console.log('gauge:'+newDate.getSeconds() )
@@ -225,10 +255,21 @@ const app = Vue.createApp({
           }
           if(mode=='category'||mode=='beforemount')
           {
-
+            this.QueryData('dht22')
+            this.DumpData('dht22',)
+            date = this.weekday[newDate.getDay()] +' '+String(newDate.getHours())+':'+String(newDate.getMinutes())
             this.lineChartTempOption.series[0].data.push(this.temp)
-            this.lineChartTempOption.xAxis.data.push(this.weekday[newDate.getDay()] +' '+String(newDate.getHours())+':'+String(newDate.getMinutes()))
-            
+            this.lineChartTempOption.xAxis.data.push(date)
+            var dump_data= {
+              date :
+              {
+                'temp':this.temp,
+                'humi':this.humi,
+              }
+
+            }
+            this.DumpData('dht22',dump_data)
+
             this.lineChartTempOption.series[0].color=this.weekdayColor[newDate.getDay()]
 
           }
@@ -290,7 +331,7 @@ const app = Vue.createApp({
     mounted(){
         this.getNetworkIp()
         this.UpdateGauge(3000)
-        this.UpdateCategory(60000) //1800000 for 30 mins
+        this.UpdateCategory(3000) //1800000 for 30 mins
        
     },
     // beforeMount(){

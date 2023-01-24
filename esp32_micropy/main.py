@@ -20,7 +20,7 @@ from microdot_utemplate import render_template,init_templates
 
 CONFIG_PATH = './config.json'
 # WIFI_SETUP_TEMPLATE = './WiFi_setup.html'
-
+DHTRECORDING = './DHT_recording.json' 
 
 class SmartOfficeStation():
   def __init__(self) -> None:
@@ -45,11 +45,12 @@ class SmartOfficeStation():
     '''
 
     with open(CONFIG_PATH,"w") as dump_file:
-      self.config["SSID"] = ssid
       self.config["SSID_PASS"]=passwd
+      self.config["SSID"] = ssid
 
       ujson.dump(self.config,dump_file)
-    
+   
+      
 
   def _get_SSID(self):
     '''
@@ -217,14 +218,22 @@ class SmartOfficeStation():
         'humidity':self.dht.humidity(),
 
       }
+      
+
+
+
       return dht_data
   
-    
+    @app.route('/dht22/dump', methods=['POST'])
+    async def dht_dump(request):
+      print(request.json)
+      with open(DHTRECORDING,"a+") as dump_file:
+        ujson.dump(request.json,dump_file)
+
+
     # @app.route('/ifconfig', methods=['GET'])
     # def netconfig_enterpoint(request):
     #   netconfig = {
-    #     'ip':self.netconfig[0]
-
     #   }
     #   return netconfig
 
