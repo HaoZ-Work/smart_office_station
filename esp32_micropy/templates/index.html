@@ -287,7 +287,7 @@ const app = Vue.createApp({
           if(mode=='category'||mode=='beforemount')
           {
             this.QueryData('dht22')
-            var currentDate= this.weekday[newDate.getDay()] +' '+String(newDate.getHours())+':'+String(newDate.getMinutes())+':'+String(newDate.getSeconds())
+            var currentDate= this.weekday[newDate.getDay()] +' '+String(newDate.getHours())+':'+String(newDate.getMinutes())
 
             this.lineChartTempOption.series[0].data.push(this.temp)
             this.lineChartTempOption.xAxis.data.push(currentDate)
@@ -377,7 +377,7 @@ const app = Vue.createApp({
                     this.lineChartTempOption.series[0].data=[]
                     this.lineChartTempOption.xAxis.data=[]
                     for (i in response.data){
-                      this.lineChartTempOption.series[0].data.push(response.data[i]["humidity"])
+                      this.lineChartTempOption.series[0].data.push(response.data[i]["temperature"])
                       this.lineChartTempOption.xAxis.data.push(i)
                       // this.savedDht22Data_X.push(i)
                       // this.savedDht22Data_Y.push(response.data[i])
