@@ -114,6 +114,9 @@ const app = Vue.createApp({
           "purple",
           "gray"
         ],
+        savedDht22Data_X:[],
+        savedDht22Data_Y:[],
+        savedTempData:[],
         temp_option:{
           // width: 8000,
           // height: 4000,
@@ -152,7 +155,7 @@ const app = Vue.createApp({
         lineChartTempOption:{
           xAxis: {
             type: 'category',
-            data: []
+            data:[],
           },
           yAxis: {
             type: 'value',
@@ -166,7 +169,7 @@ const app = Vue.createApp({
             },
           series: [
             {
-              data: [],
+              data:[], 
               color:'black',
               type: 'line',
               smooth: true,
@@ -205,33 +208,61 @@ const app = Vue.createApp({
                 console.log(error);
                 });
         },
-        DumpData(enter_point,data){
-            var config = {
+        // QueryDumpData(enter_point){
+        //     var config = {
           
-            method: 'post',
-            url: 'http://'+this.ip+'/'+enter_point+'/'+'dump',
-            headers: {},
-            data :data
-
-
-          };
+        //     method: 'get',
+        //     url: 'http://'+this.ip+'/'+enter_point+'/dump',
+        //     headers: {} };
         
-            axios(config)
-                .then(function (response) {
-                    // console.log(response.data);
+        //     axios(config)
+        //         .then(function (response) {
+        //         //console.log("resp:"+response.data);
+        //         // this.savedDht22Data.date = response.data.keys()
+        //         // this.savedDht22Data.data = response.data.values()
+        //         // this.savedDht22Data=response.data
+        //         // console.log("this saved data:"+this.savedDht22Data)
+        //         for (i in response.data){
+        //           console.log(i)
+        //         }
+        //         this.savedDht22Data_X =Object.keys( response.data) 
+        //         this.savedDht22Data_Y = Object.values( response.data)
+        //         console.log(this.savedDht22Data_X)
+        //         console.log(this.savedDht22Data_Y)
                 
-                    this.temp=response.data['temperature']
-                    this.humi=response.data['humidity']
-                    console.log(this.temp)
-                    console.log("dht data updated!")
+                    
+        //         }.bind(this))
+        //         .catch(function (error) {
+        //         console.log(error);
+        //         });
+        // },
+        // DumpData(enter_point,data){
+          //   var config = {
+          
+          //   method: 'post',
+          //   url: 'http://'+this.ip+'/'+enter_point+'/'+'dump',
+          //   headers: {},
+          //   data :data
+
+
+          // };
+        
+        //     axios(config)
+        //         .then(function (response) {
+        //             // console.log(response.data);
+                
+        //             this.temp=response.data['temperature']
+        //             this.humi=response.data['humidity']
+        //             console.log(this.temp)
+        //             console.log("dht data updated!")
 
                 
                     
-                }.bind(this))
-                .catch(function (error) {
-                console.log(error);
-                });
-        },
+        //         }.bind(this))
+        //         .catch(function (error) {
+        //         console.log(error);
+        //         });
+        // },
  
         dht22Update(mode) {
           // mode: choose which part should be update
@@ -256,19 +287,19 @@ const app = Vue.createApp({
           if(mode=='category'||mode=='beforemount')
           {
             this.QueryData('dht22')
-            this.DumpData('dht22',)
-            date = this.weekday[newDate.getDay()] +' '+String(newDate.getHours())+':'+String(newDate.getMinutes())
-            this.lineChartTempOption.series[0].data.push(this.temp)
-            this.lineChartTempOption.xAxis.data.push(date)
-            var dump_data= {
-              date :
-              {
-                'temp':this.temp,
-                'humi':this.humi,
-              }
+            var currentDate= this.weekday[newDate.getDay()] +' '+String(newDate.getHours())+':'+String(newDate.getMinutes())+':'+String(newDate.getSeconds())
 
-            }
-            this.DumpData('dht22',dump_data)
+            this.lineChartTempOption.series[0].data.push(this.temp)
+            this.lineChartTempOption.xAxis.data.push(currentDate)
+            //console.log(typeof(currentDate))
+            dump_data= {}
+            dump_data[currentDate] = {
+                "temp":this.temp,
+                "humi":this.humi,
+              }
+             
+            //consoly.log(dump_data)
+            //this.DumpData('dht22',dump_data)
 
             this.lineChartTempOption.series[0].color=this.weekdayColor[newDate.getDay()]
 
@@ -293,6 +324,7 @@ const app = Vue.createApp({
         },
         UpdateCategory:async function(freq)  {
             var T= true
+            //this.querySavedDht22Data('dht22')
             while (T){
               this.dht22Update('category')
                 await this.sleep(freq)
@@ -326,16 +358,77 @@ const app = Vue.createApp({
 
 
           console.log(newDate)
+        },
+        
+        querySavedDht22Data(enter_point){
+          /*
+          Get saved dht22 data from api, and put it into the options of chart.
+          
+          */
+           var config = {
+          
+            method: 'get',
+            url: 'http://'+this.ip+'/'+enter_point+'/dumped',
+            headers: {} };
+        
+            axios(config)
+                .then(function (response) {
+                    console.log(response.data);
+                    this.lineChartTempOption.series[0].data=[]
+                    this.lineChartTempOption.xAxis.data=[]
+                    for (i in response.data){
+                      this.lineChartTempOption.series[0].data.push(response.data[i]["humidity"])
+                      this.lineChartTempOption.xAxis.data.push(i)
+                      // this.savedDht22Data_X.push(i)
+                      // this.savedDht22Data_Y.push(response.data[i])
+                    }
+                    this.lineChartTempOption.xAxis.data.sort()
+                    console.log(this.lineChartTempOption.xAxis.data)
+                    console.log(this.lineChartTempOption.series[0].data)
+            
+                    // console.log(this.savedDht22Data_X)
+                    // console.log(this.savedDht22Data_Y)
+                
+               
+
+        
+                    
+                }.bind(this))
+                .catch(function (error) {
+                console.log(error);
+                });
+
+        //   this.QueryDumpData('dht22')
+        //   console.log("type of temp ",this.savedTempData)
+        //   console.log("type of X",this.savedDht22Data_X)
+        //   //这两个for循环没有执行
+        //   for (i in this.savedDht22Data_Y){
+        //     console.log(i['temp'])
+        //     this.lineChartTempOption.series[0].data.push(i['temp'])
+           
+
+        //   }
+        //   for (i in this.savedDht22Data_X){
+        //     this.lineChartTempOption.xAxis.data.push(this.savedDht22Data_X[i])
+        //   }
+        //   console.log(this.lineChartTempOption)
+        //   // this.lineChartTempOption.series[0].data=this.savedTempData
+        //   // this.lineChartTempOption.xAxis.data = this.savedDht22Data_X
+        //   // console.log(savedTempData)
         }
     },
     mounted(){
         this.getNetworkIp()
+
+        this.querySavedDht22Data('dht22')
         this.UpdateGauge(3000)
-        this.UpdateCategory(3000) //1800000 for 30 mins
+        this.UpdateCategory(300000) //1800000 for 30 mins
        
     },
     // beforeMount(){
-    //   this.dht22Update('beforemount')
+    //   this.getNetworkIp()
+    //   this.querySavedDht22Data()
+
 
     // }
 
