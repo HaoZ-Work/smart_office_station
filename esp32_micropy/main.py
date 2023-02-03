@@ -7,6 +7,11 @@ import machine
 import ujson
 import socket
 
+try:
+    import uasyncio as asyncio
+except ImportError:
+    import asyncio
+
 from machine import Pin, SoftI2C,SPI
 import ssd1306
 
@@ -218,19 +223,44 @@ class SmartOfficeStation():
         'humidity':self.dht.humidity(),
 
       }
-      
+
+
+
+ 
 
 
 
       return dht_data
   
-    @app.route('/dht22/dump', methods=['POST'])
+    @app.route('/dht22/dump', methods=['POST','GET'])
     async def dht_dump(request):
-      print(request.json)
-      with open(DHTRECORDING,"a+") as dump_file:
-        ujson.dump(request.json,dump_file)
+      
+      with open(DHTRECORDING,"r") as dump_file:
+        dht_recording = ujson.load(dump_file)
+        print(f"Loaded data:{dht_recording}")
+        dump_file.close()
+      if request.method =='GET':
+        print("Send dumped data via GET.")
+        return dht_recording
 
+      # if request.method == 'POST':
+      #   with open(DHTRECORDING,"w") as dump_file:
+      #     if  list(request.json.values())[0]!={}:
+      #       #print(f"---List of keys:{dht_recording[list(request.json.keys())[0]]}---") ## add this print here will break the json file. Dont know why.
+      #       dht_recording[list(request.json.keys())[0]] = list(request.json.values())[0]
+      #       #print(f"after adding data:{dht_recording}")
+      #       #print(f"New coming data:{list(request.json.keys())[0]}:{list(request.json.values())[0]}")
+      #       if len(dht_recording) > 10:
+      #         dht_recording_list = list(dht_recording.keys())
+      #         dht_recording_list.sort()
+      #         # print(f"List of rec:{dht_recording_list}")
+      #         #print(f"---deleted:{dht_recording_list[0]}---")
 
+      #         dht_recording.pop( dht_recording_list[0] )
+      #       print(f"new after deleting:{dht_recording}")
+      #       ujson.dump(dht_recording,dump_file)
+
+      #     dump_file.close()
     # @app.route('/ifconfig', methods=['GET'])
     # def netconfig_enterpoint(request):
     #   netconfig = {
@@ -242,12 +272,87 @@ class SmartOfficeStation():
     print("Running server..")
     self.SERVER_RUNNING=True
 
-    # async def start_async_server():
-    #   await app.start_server(host='0.0.0.0',port=80,debug=True)
 
-    # asyncio.run(start_async_server())
-    app.run(host='0.0.0.0',port=80,debug=True)
+    async def start_async_server():
+      task1 = asyncio.create_task(self._client())
+      task2 = asyncio.create_task(app.run(host='0.0.0.0',port=80,debug=True)
+)    
+      await task1
+      await task2
+ 
+    #app.run(host='0.0.0.0',port=80,debug=True)
+
+
+    asyncio.run(start_async_server())
+    # print("end")
     
+    
+  async def _client(self):
+    print("Running client")
+
+
+    while True:
+      await asyncio.sleep(120)
+      self._dumpdht22()
+
+      print('Hello world')
+  
+  def _dumpdht22(self):
+    '''
+    Write current data from dht22 sensor to json file.
+    recording example: {'Fri 11:27:38': {'humidity': 35.4, 'temperature': 27.5}}
+    '''
+    weekday={
+          "Sunday":"Sun",
+          "Monday":"Mon",
+          "Tuesday":"Tues",
+          "Wednesday":"Wed",
+          "Thursday":"Thur",
+          "Friday":"Fri",
+          "Saturday":"Sat"
+    }
+    with open(DHTRECORDING,"r") as dump_file:
+        dht_recording = ujson.load(dump_file)
+        #print(f"Loaded data:{dht_recording}")
+        dump_file.close()
+    with open(DHTRECORDING,"w") as dump_file:
+      self.dht.measure()
+      # localtime = time.localtime(time.time())
+     
+      date = requests.get(url="https://www.timeapi.io/api/Time/current/zone?timeZone="+"Europe/Berlin")
+      print(date.json()['time'])
+
+      ## TODO: time zone should be in env.
+      #date = weekday[date.json()['dayOfWeek']]+' '+ str(date.json()['hour']) + ':'+str(date.json()['minute'])+ ':'+ str( date.json()['seconds'])
+      date = weekday[date.json()['dayOfWeek']]+' '+ date.json()['time']
+
+      dump_data ={
+        date:{
+        'temperature':self.dht.temperature(),
+        'humidity':self.dht.humidity(),
+
+      }
+      }
+      #print(dump_data)
+      # print(f"dump data:{dump_data}")
+      dht_recording[date] = {
+        'temperature':self.dht.temperature(),
+        'humidity':self.dht.humidity(),
+      }
+      if len(dht_recording) > 10:
+        dht_recording_list = list(dht_recording.keys())
+        dht_recording_list.sort()
+        ## TODO: bug:  12:56:4 will be large than  12:56:23, because it should be  12:56:04 instead ( can remove the second)
+        # print(f"List of rec:{dht_recording_list}")
+        print(f"---deleted:{dht_recording_list[0]}---")
+
+        dht_recording.pop( dht_recording_list[0] )
+        #print(f"new after deleting:{dht_recording}")
+      ujson.dump(dht_recording,dump_file)
+      dump_file.close()
+
+ 
+
 
   def _oled_init(self):
     i2c = SoftI2C(scl=Pin(self.config["OLED_SCL"]), sda=Pin(self.config["OLED_SDA"]))
@@ -267,47 +372,7 @@ def main():
 
   smartoffice = SmartOfficeStation()
   smartoffice.server()
-  # sta_if = network.WLAN(network.STA_IF)
-  # sta_if.active(True)
-
-  # sta_if.config(reconnects=-1)
-
-    
-  # print('connecting to network...')
-  # sta_if.disconnect()
-  # SSID = 'H2G'
-  # SSID_PASS='zh970201'
-  # sta_if.connect(SSID,SSID_PASS)
-  # time.sleep(5)
-
-  # app=Microdot()
-  # # @app.get('/')
-  # # def index(request):
-  # #   # return 'Hello, world!'
-
-  # #   return render_template('WiFi_setup.html',test='666')
   
-  # # @app.post('/post')
-  # # def post(request):
-  # #   # return 'Hello, world!'
-  # #   ssid = request.form.get('SSID')
-  # #   ps = request.form.get('Pass')
-  # #   print(ssid,ps)
-
-  # #   return f'{ssid,ps}'
-  # @app.route('/', methods=['GET', 'POST'])
-  # def index(request):
-  #     if request.method == 'GET':
-  #         return render_template('WiFi_setup.html',test='666')
-  #     elif request.method == 'POST':
-  #         ssid = request.form.get('SSID')
-  #         ps = request.form.get('Pass')
-  #         print(ssid,ps)
-  #         app.shutdown()
-  #         return f"SSID:{ssid},pass:{ps}, server is shuting down.."
-  
-  # app.run()
-  # print('SSID done!')
 
 if __name__ == '__main__':
   main()
