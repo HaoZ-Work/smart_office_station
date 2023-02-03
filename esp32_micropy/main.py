@@ -233,24 +233,20 @@ class SmartOfficeStation():
 
       }
 
-
-
- 
-
-
-
       return dht_data
   
-    @app.route('/dht22/dump', methods=['POST','GET'])
-    async def dht_dump(request):
+    @app.route('/dht22/dumped', methods=['GET'])
+    async def dht_return_dumped_data(request):
       
       with open(DHTRECORDING,"r") as dump_file:
         dht_recording = ujson.load(dump_file)
         print(f"Loaded data:{dht_recording}")
         dump_file.close()
-      if request.method =='GET':
-        print("Send dumped data via GET.")
-        return dht_recording
+      print("Send dumped data via GET.")
+      return dht_recording
+      # if request.method =='GET':
+        
+      #   return dht_recording
 
     # @app.route('/ifconfig', methods=['GET'])
     # def netconfig_enterpoint(request):
@@ -291,10 +287,8 @@ class SmartOfficeStation():
     print("Running client")
 
     while True:
-      await asyncio.sleep(120)
+      await asyncio.sleep(300)
       self._dumpdht22()
-
-      print('Hello world')
   
   def _dumpdht22(self):
     '''
@@ -324,20 +318,20 @@ class SmartOfficeStation():
       ## TODO: time zone should be in env.
       date = weekday[date.json()['dayOfWeek']]+' '+ date.json()['time']
 
-      dump_data ={
-        date:{
-        'temperature':self.dht.temperature(),
-        'humidity':self.dht.humidity(),
+      # dump_data ={
+      #   date:{
+      #   'temperature':self.dht.temperature(),
+      #   'humidity':self.dht.humidity(),
 
-      }
-      }
+      # }
+      # }
       #print(dump_data)
       # print(f"dump data:{dump_data}")
       dht_recording[date] = {
         'temperature':self.dht.temperature(),
         'humidity':self.dht.humidity(),
       }
-      if len(dht_recording) > 10:
+      if len(dht_recording) > 2106: ## 2106 is 7*24*12,means record it each 5mins for a week. TODO: should be in config.
         dht_recording_list = list(dht_recording.keys())
         dht_recording_list.sort()
         print(f"---deleted:{dht_recording_list[0]}---")
