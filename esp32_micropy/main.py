@@ -189,6 +189,10 @@ class SmartOfficeStation():
     self.oled.show()
 
   def _dht_init(self):
+    '''
+    Initialize the dht22 sensor
+    
+    '''
     # print(self.config)
     self.dht = dht.DHT22(machine.Pin(self.config["DHT_DATA_PIN"]))
 
@@ -196,14 +200,19 @@ class SmartOfficeStation():
 
 
   def server(self):
+    '''
+    a server application from microdot. It can hold the api and html page here.
+    '''
     app=async_Microdot()
 
-    @app.route('/', methods=['GET', 'POST'])
+    @app.route('/', methods=['GET'])
     async def server_index(request):
-        if request.method == 'GET':
-          
+      '''
+      The enter point of html page.
+      '''
+      if request.method == 'GET':
             # self.dht.measure() ## TODO: keep updating even without web user?
-            return render_template('index.html',ip=self.netconfig[0])
+        return render_template('index.html',ip=self.netconfig[0])
 
     @app.route('/dht22', methods=['GET'])
     async def dht_enterpoint(request):
@@ -243,24 +252,6 @@ class SmartOfficeStation():
         print("Send dumped data via GET.")
         return dht_recording
 
-      # if request.method == 'POST':
-      #   with open(DHTRECORDING,"w") as dump_file:
-      #     if  list(request.json.values())[0]!={}:
-      #       #print(f"---List of keys:{dht_recording[list(request.json.keys())[0]]}---") ## add this print here will break the json file. Dont know why.
-      #       dht_recording[list(request.json.keys())[0]] = list(request.json.values())[0]
-      #       #print(f"after adding data:{dht_recording}")
-      #       #print(f"New coming data:{list(request.json.keys())[0]}:{list(request.json.values())[0]}")
-      #       if len(dht_recording) > 10:
-      #         dht_recording_list = list(dht_recording.keys())
-      #         dht_recording_list.sort()
-      #         # print(f"List of rec:{dht_recording_list}")
-      #         #print(f"---deleted:{dht_recording_list[0]}---")
-
-      #         dht_recording.pop( dht_recording_list[0] )
-      #       print(f"new after deleting:{dht_recording}")
-      #       ujson.dump(dht_recording,dump_file)
-
-      #     dump_file.close()
     # @app.route('/ifconfig', methods=['GET'])
     # def netconfig_enterpoint(request):
     #   netconfig = {
@@ -274,6 +265,9 @@ class SmartOfficeStation():
 
 
     async def start_async_server():
+      '''
+      This function wraps server and client. By using asyncio, they run simultaneously
+      '''
       task1 = asyncio.create_task(self._client())
       task2 = asyncio.create_task(app.run(host='0.0.0.0',port=80,debug=True)
 )    
@@ -288,8 +282,13 @@ class SmartOfficeStation():
     
     
   async def _client(self):
+    '''
+    A client to hold some functions and make them run while server is running.
+    Notice that, even it is called as client, but seems send request from here to server is not possible, unknown reason. 
+    
+    
+    '''
     print("Running client")
-
 
     while True:
       await asyncio.sleep(120)
@@ -323,7 +322,6 @@ class SmartOfficeStation():
       print(date.json()['time'])
 
       ## TODO: time zone should be in env.
-      #date = weekday[date.json()['dayOfWeek']]+' '+ str(date.json()['hour']) + ':'+str(date.json()['minute'])+ ':'+ str( date.json()['seconds'])
       date = weekday[date.json()['dayOfWeek']]+' '+ date.json()['time']
 
       dump_data ={
@@ -342,8 +340,6 @@ class SmartOfficeStation():
       if len(dht_recording) > 10:
         dht_recording_list = list(dht_recording.keys())
         dht_recording_list.sort()
-        ## TODO: bug:  12:56:4 will be large than  12:56:23, because it should be  12:56:04 instead ( can remove the second)
-        # print(f"List of rec:{dht_recording_list}")
         print(f"---deleted:{dht_recording_list[0]}---")
 
         dht_recording.pop( dht_recording_list[0] )
@@ -355,6 +351,9 @@ class SmartOfficeStation():
 
 
   def _oled_init(self):
+    '''
+    Initialized the olde monitor
+    '''
     i2c = SoftI2C(scl=Pin(self.config["OLED_SCL"]), sda=Pin(self.config["OLED_SDA"]))
     oled_width = self.config["OLED_WIDTH"]
     oled_height = self.config["OLED_HEIGHT"]
@@ -368,8 +367,6 @@ class SmartOfficeStation():
 
 def main():
   Response.default_content_type = 'text/html'
-
-
   smartoffice = SmartOfficeStation()
   smartoffice.server()
   
