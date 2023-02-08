@@ -28,6 +28,9 @@ CONFIG_PATH = './config.json'
 DHTRECORDING = './DHT_recording.json' 
 
 class SmartOfficeStation():
+  '''
+  This is the main class, new methods should be added here.
+  '''
   def __init__(self) -> None:
      self._load_config()
      self._oled_init()
@@ -88,6 +91,9 @@ class SmartOfficeStation():
     app=Microdot()
     @app.route('/', methods=['GET', 'POST'])
     def AP_index(request):
+        '''
+        The enter point of wifi setup page, user can set up wifi here under ap mode.
+        '''
         if request.method == 'GET':
             return render_template('WiFi_setup.html',test='test')
         elif request.method == 'POST':
@@ -102,6 +108,9 @@ class SmartOfficeStation():
     
     @app.route('/src/<path:path>')
     def static(request, path):
+        '''
+        The path exposes the static resource file, like imgs or pics.
+        '''
         if '..' in path:
             # directory traversal is not allowed
             return 'Not found', 404
@@ -208,7 +217,7 @@ class SmartOfficeStation():
     @app.route('/', methods=['GET'])
     async def server_index(request):
       '''
-      The enter point of html page.
+      The enter point of main html page.
       '''
       if request.method == 'GET':
             # self.dht.measure() ## TODO: keep updating even without web user?
@@ -216,6 +225,10 @@ class SmartOfficeStation():
 
     @app.route('/dht22', methods=['GET'])
     async def dht_enterpoint(request):
+      '''
+      The path for get data of dht22 sensor
+      
+      '''
       self.dht.measure()
       self.oled.fill(0)
       if self.SHOW_NET_CONFIG==True:
@@ -237,7 +250,10 @@ class SmartOfficeStation():
   
     @app.route('/dht22/dumped', methods=['GET'])
     async def dht_return_dumped_data(request):
+      '''
+      The path for returning saved dht22 data from local json file.
       
+      '''
       with open(DHTRECORDING,"r") as dump_file:
         dht_recording = ujson.load(dump_file)
         print(f"Loaded data:{dht_recording}")
@@ -325,8 +341,7 @@ class SmartOfficeStation():
 
       # }
       # }
-      #print(dump_data)
-      # print(f"dump data:{dump_data}")
+
       dht_recording[date] = {
         'temperature':self.dht.temperature(),
         'humidity':self.dht.humidity(),
@@ -339,6 +354,7 @@ class SmartOfficeStation():
         dht_recording.pop( dht_recording_list[0] )
         #print(f"new after deleting:{dht_recording}")
       ujson.dump(dht_recording,dump_file)
+      dht_recording= 0## 2106 is 7*24*12,means record it each 5mins for a week. TODO: should be in config.
       dump_file.close()
 
  
