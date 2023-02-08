@@ -208,70 +208,10 @@ const app = Vue.createApp({
                 console.log(error);
                 });
         },
-        // QueryDumpData(enter_point){
-        //     var config = {
-          
-        //     method: 'get',
-        //     url: 'http://'+this.ip+'/'+enter_point+'/dump',
-        //     headers: {} };
-        
-        //     axios(config)
-        //         .then(function (response) {
-        //         //console.log("resp:"+response.data);
-        //         // this.savedDht22Data.date = response.data.keys()
-        //         // this.savedDht22Data.data = response.data.values()
-        //         // this.savedDht22Data=response.data
-        //         // console.log("this saved data:"+this.savedDht22Data)
-        //         for (i in response.data){
-        //           console.log(i)
-        //         }
-        //         this.savedDht22Data_X =Object.keys( response.data) 
-        //         this.savedDht22Data_Y = Object.values( response.data)
-        //         console.log(this.savedDht22Data_X)
-        //         console.log(this.savedDht22Data_Y)
-                
-                    
-        //         }.bind(this))
-        //         .catch(function (error) {
-        //         console.log(error);
-        //         });
-        // },
-        // DumpData(enter_point,data){
-          //   var config = {
-          
-          //   method: 'post',
-          //   url: 'http://'+this.ip+'/'+enter_point+'/'+'dump',
-          //   headers: {},
-          //   data :data
-
-
-          // };
-        
-        //     axios(config)
-        //         .then(function (response) {
-        //             // console.log(response.data);
-                
-        //             this.temp=response.data['temperature']
-        //             this.humi=response.data['humidity']
-        //             console.log(this.temp)
-        //             console.log("dht data updated!")
-
-                
-                    
-        //         }.bind(this))
-        //         .catch(function (error) {
-        //         console.log(error);
-        //         });
-        // },
- 
+      
         dht22Update(mode) {
           // mode: choose which part should be update
-          // this.QueryData('dht22')
-          // if (mode!='beforemount')
-          // {
-          //   document.getElementById("temp").innerHTML="temperature:"+this.temp;
-          //   document.getElementById("humi").innerHTML="humidity:"+this.humi;
-          // }
+       
       
           newDate = new Date()
 
@@ -398,23 +338,7 @@ const app = Vue.createApp({
                 console.log(error);
                 });
 
-        //   this.QueryDumpData('dht22')
-        //   console.log("type of temp ",this.savedTempData)
-        //   console.log("type of X",this.savedDht22Data_X)
-        //   //这两个for循环没有执行
-        //   for (i in this.savedDht22Data_Y){
-        //     console.log(i['temp'])
-        //     this.lineChartTempOption.series[0].data.push(i['temp'])
-           
-
-        //   }
-        //   for (i in this.savedDht22Data_X){
-        //     this.lineChartTempOption.xAxis.data.push(this.savedDht22Data_X[i])
-        //   }
-        //   console.log(this.lineChartTempOption)
-        //   // this.lineChartTempOption.series[0].data=this.savedTempData
-        //   // this.lineChartTempOption.xAxis.data = this.savedDht22Data_X
-        //   // console.log(savedTempData)
+   
         }
     },
     mounted(){
