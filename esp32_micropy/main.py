@@ -280,11 +280,18 @@ class SmartOfficeStation():
       '''
       This function wraps server and client. By using asyncio, they run simultaneously
       '''
-      task1 = asyncio.create_task(self._client())
-      task2 = asyncio.create_task(app.run(host='0.0.0.0',port=80,debug=True)
-)    
+
+      dump_client = self._client(self._dumpdht22,30)
+      task1 = asyncio.create_task(dump_client())
+
+      query_client = self._client(self._querydht22,3)
+      task3 = asyncio.create_task(query_client())
+
+      # task1 = asyncio.create_task(self._dumpdht22())
+      task2 = asyncio.create_task(app.run(host='0.0.0.0',port=80,debug=True))    
       await task1
       await task2
+      await task3
  
     #app.run(host='0.0.0.0',port=80,debug=True)
 
@@ -293,19 +300,47 @@ class SmartOfficeStation():
     # print("end")
     
     
-  async def _client(self):
+  def _client(self,func, delay):
     '''
     A client to hold some functions and make them run while server is running.
     Notice that, even it is called as client, but seems send request from here to server is not possible, unknown reason. 
     
+    Args:
+        func: the function to be wrapped
+        delay: sleep time in seconds.
     
     '''
     print("Running client")
 
-    while True:
-      await asyncio.sleep(300)
-      self._dumpdht22()
+    async def wrapper():
+      while True:
+        # print("running wrapper")
+        func()
+        await asyncio.sleep(delay)    
+       
+    
+    
+    return wrapper
+
   
+  # @_client(delay=30)
+  def _querydht22(self):
+    '''
+     This function will make device refresh data via dht22 and make them display on monitor
+    '''
+    self.dht.measure()
+    self.oled.fill(0)
+    if self.SHOW_NET_CONFIG==True:
+            self.oled.text("WiFi connected.",0,0)
+            self.oled.text(f"{self.netconfig[0]}",0,20)
+    if self.SERVER_RUNNING==True:
+            self.oled.text("Server is on:",0,10)
+
+    self.oled.text(f"temp:{self.dht.temperature()}C",0,30)
+    self.oled.text(f"hudi:{self.dht.humidity()}%",0,40)
+    self.oled.show()
+
+    
   def _dumpdht22(self):
     '''
     Write current data from dht22 sensor to json file.
@@ -328,7 +363,7 @@ class SmartOfficeStation():
       self.dht.measure()
       # localtime = time.localtime(time.time())
      
-      date = requests.get(url="https://www.timeapi.io/api/Time/current/zone?timeZone="+"Europe/Berlin")
+      date = requests.get(url="https://www.timeapi.io/api/Time/current/zone?timeZone="+self.config["TIMEZONE"])
       print(date.json()['time'])
 
       ## TODO: time zone should be in env.
