@@ -26,7 +26,7 @@ from microdot_utemplate import render_template,init_templates
 
 CONFIG_PATH = './config.json'
 # WIFI_SETUP_TEMPLATE = './WiFi_setup.html'
-DHTRECORDING = './DHT_recording.json' 
+DHTRECORDING = './DHT_recording.csv' 
 
 class SmartOfficeStation():
   '''
@@ -255,11 +255,21 @@ class SmartOfficeStation():
       The path for returning saved dht22 data from local json file.
       
       '''
-      with open(DHTRECORDING,"r") as dump_file:
-        dht_recording = ujson.load(dump_file)
-        print(f"Loaded data:{dht_recording}")
-        dump_file.close()
-      print("Send dumped data via GET.")
+      # with open(DHTRECORDING,"r") as dump_file:
+      #   dht_recording = ujson.load(dump_file)
+      #   print(f"Loaded data:{dht_recording}")
+      #   dump_file.close()
+      # print("Send dumped data via GET.")
+
+      dht_recording = []
+      with open('DHT_recording.csv','r') as file:
+        for line in file:
+          line_Str=file.readline()
+          print(line_Str)
+          line_Str=line_Str.rstrip('\n')
+          line_Str=line_Str.rstrip('\r')
+          dht_recording.append(line_Str.split(','))
+
       return dht_recording
       # if request.method =='GET':
         
@@ -282,7 +292,7 @@ class SmartOfficeStation():
       This function wraps server and client. By using asyncio, they run simultaneously
       '''
 
-      dump_client = self._client(self._dumpdht22,300)
+      dump_client = self._client(self._dumpdht22,10)
       task1 = asyncio.create_task(dump_client())
 
       query_client = self._client(self._querydht22,3)
@@ -342,6 +352,58 @@ class SmartOfficeStation():
     self.oled.show()
 
     
+  # def _dumpdht22(self):
+  #   '''
+  #   Write current data from dht22 sensor to json file.
+  #   recording example: {'Fri 11:27:38': {'humidity': 35.4, 'temperature': 27.5}}
+  #   '''
+  #   weekday={
+  #         "Sunday":"Sun",
+  #         "Monday":"Mon",
+  #         "Tuesday":"Tues",
+  #         "Wednesday":"Wed",
+  #         "Thursday":"Thur",
+  #         "Friday":"Fri",
+  #         "Saturday":"Sat"
+  #   }
+  #   with open(DHTRECORDING,"r") as dump_file:
+  #       dht_recording = ujson.load(dump_file)
+  #       #print(f"Loaded data:{dht_recording}")
+  #       dump_file.close()
+  #   with open(DHTRECORDING,"w") as dump_file:
+  #     self.dht.measure()
+  #     # localtime = time.localtime(time.time())
+     
+  #     date = requests.get(url="https://www.timeapi.io/api/Time/current/zone?timeZone="+self.config["TIMEZONE"])
+  #     print(date.json()['time'])
+
+  #     date = weekday[date.json()['dayOfWeek']]+' '+ date.json()['time']
+
+  #     # dump_data ={
+  #     #   date:{
+  #     #   'temperature':self.dht.temperature(),
+  #     #   'humidity':self.dht.humidity(),
+
+  #     # }
+  #     # }
+
+  #     dht_recording[date] = {
+  #       'temperature':self.dht.temperature(),
+  #       'humidity':self.dht.humidity(),
+  #     }
+  #     if len(dht_recording) > 168: ## 2106 is 7*24*12,means record it each 5mins for a week. TODO: should be in config.
+  #       dht_recording_list = list(dht_recording.keys())
+  #       dht_recording_list.sort()
+  #       print(f"---deleted:{dht_recording_list[0]}---")
+
+  #       dht_recording.pop( dht_recording_list[0] )
+  #       #print(f"new after deleting:{dht_recording}")
+  #     ujson.dump(dht_recording,dump_file)
+  #     dht_recording= 0
+  #     dump_file.close()
+  
+  
+  
   def _dumpdht22(self):
     '''
     Write current data from dht22 sensor to json file.
@@ -356,43 +418,56 @@ class SmartOfficeStation():
           "Friday":"Fri",
           "Saturday":"Sat"
     }
+  
+    csv_len = 0
+    dht_recording=[]
+    self.dht.measure()
+    date = requests.get(url="https://www.timeapi.io/api/Time/current/zone?timeZone="+self.config["TIMEZONE"])
+    date = weekday[date.json()['dayOfWeek']]+' '+ date.json()['time']
+
+    new_data = date+","+ str(self.dht.temperature()) +","+ str(self.dht.humidity())
+    print(f"new data:{new_data}")
+    
+    ## get the length of saved csv data
     with open(DHTRECORDING,"r") as dump_file:
-        dht_recording = ujson.load(dump_file)
+        for line in dump_file:
+          line_Str=dump_file.readline()
+          #print(line_Str)
+          line_Str=line_Str.rstrip('\n')
+          line_Str=line_Str.rstrip('\r')
+          # print(line_Str)
+          dht_recording.append(line_Str.split(','))
+          csv_len+=1
         #print(f"Loaded data:{dht_recording}")
         dump_file.close()
-    with open(DHTRECORDING,"w") as dump_file:
-      self.dht.measure()
-      # localtime = time.localtime(time.time())
-     
-      date = requests.get(url="https://www.timeapi.io/api/Time/current/zone?timeZone="+self.config["TIMEZONE"])
-      print(date.json()['time'])
 
-      ## TODO: time zone should be in env.
-      date = weekday[date.json()['dayOfWeek']]+' '+ date.json()['time']
 
-      # dump_data ={
-      #   date:{
-      #   'temperature':self.dht.temperature(),
-      #   'humidity':self.dht.humidity(),
+    print(f"len of csv:{csv_len}")
+    CSV_MAXLEN = 168
+    if csv_len >= CSV_MAXLEN:
+      #print("---add/delete mode---")
+      idx = 0
+      with open(DHTRECORDING,"w") as dump_file:
+        for line in dht_recording:
+           if idx!=0:
+              # print(line)
+              line = line[0]+','+line[1]+','+line[2]
+              # print(line)
+              dump_file.write('\n'+line+'\n')
+           idx+=1
+        dump_file.write('\n'+new_data+'\n')
+        dump_file.close()
+    else:
+      with open(DHTRECORDING,"a") as dump_file:
+        print('Writing New data')
+        dump_file.write('\n'+new_data+'\n') 
+        #dump_file.close()
+    
 
-      # }
-      # }
+  
+   
 
-      dht_recording[date] = {
-        'temperature':self.dht.temperature(),
-        'humidity':self.dht.humidity(),
-      }
-      if len(dht_recording) > 2106: ## 2106 is 7*24*12,means record it each 5mins for a week. TODO: should be in config.
-        dht_recording_list = list(dht_recording.keys())
-        dht_recording_list.sort()
-        print(f"---deleted:{dht_recording_list[0]}---")
-
-        dht_recording.pop( dht_recording_list[0] )
-        #print(f"new after deleting:{dht_recording}")
-      ujson.dump(dht_recording,dump_file)
-      dht_recording= 0## 2106 is 7*24*12,means record it each 5mins for a week. TODO: should be in config.
-      dump_file.close()
-
+        
  
 
 
