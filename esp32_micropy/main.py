@@ -292,7 +292,7 @@ class SmartOfficeStation():
       This function wraps server and client. By using asyncio, they run simultaneously
       '''
 
-      dump_client = self._client(self._dumpdht22,10)
+      dump_client = self._client(self._dumpdht22,3600)
       task1 = asyncio.create_task(dump_client())
 
       query_client = self._client(self._querydht22,3)
