@@ -317,8 +317,9 @@ const app = Vue.createApp({
                     this.lineChartTempOption.series[0].data=[]
                     this.lineChartTempOption.xAxis.data=[]
                     for (i in response.data){
-                      this.lineChartTempOption.series[0].data.push(response.data[i]["temperature"])
-                      this.lineChartTempOption.xAxis.data.push(i)
+                      console.log( response.data[i])
+                      this.lineChartTempOption.series[0].data.push(response.data[i][1])
+                      this.lineChartTempOption.xAxis.data.push(response.data[i][0])
                       // this.savedDht22Data_X.push(i)
                       // this.savedDht22Data_Y.push(response.data[i])
                     }
