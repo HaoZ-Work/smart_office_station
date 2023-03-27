@@ -19,12 +19,27 @@
 </head>
 
 <body>
-<div class="container ">
+<!-- <div class="container ">
     <hr size=20 color=#b90f22> <hr size=4 color=#000000>
     <center><img src='https://www.ptw.tu-darmstadt.de/media/fachgebietptw/grafikenundfotos/logos_2/PTW_Logo.svg'  ></center> 
  
     <hr size=20 color=#b90f22> <hr size=4 color=#000000>
+  </div> -->
+
+  <div class="container ">
+    <hr size=20 color=#b90f22>
+    <hr size=4 color=#000000>
+    <div>
+    <img class="logo" src='https://www.ptw.tu-darmstadt.de/media/fachgebietptw/grafikenundfotos/logos_2/PTW_Logo.svg'   />
+    </div>
+ 
+    <hr size=20 color=#b90f22>
+    <hr size=4 color=#000000>
   </div>
+
+
+
+
 
     <p id="ip" hidden>{{ip}}</p>
 
@@ -67,7 +82,10 @@
         <div class="col-md-6"  style="width: 8000px;height:400px;">
           <v-chart  :option="lineChartTempOption" />
         </div>
-          
+         
+        <div class="col-md-6"  style="width: 8000px;height:400px;">
+          <v-chart  :option="lineChartHumiOption" />
+        </div> 
    
         
         <!-- <button :onclick="addOneData">add one point</button> -->
@@ -84,7 +102,9 @@
 
 </html>
 
-
+<style> 
+.logo{transform: translateX(330px);} 
+</style> 
 
 <script>
 
@@ -176,8 +196,35 @@ const app = Vue.createApp({
 
     }
   ]
-}
+},
+     lineChartHumiOption:{
+          xAxis: {
+            type: 'category',
+            data:[],
+          },
+          yAxis: {
+            type: 'value',
+            name: 'Humidity',
+            min: 0,
+            max: 100,
+            position: 'left',
+            axisLabel: {
+              formatter: '{value} %'
+              }
+            },
+          series: [
+            {
+              data:[], 
+              color:'black',
+              type: 'line',
+              smooth: true,
+
+    }
+  ]
+},
+  
      }
+     
     },
     methods:{
         getNetworkIp(){
@@ -247,9 +294,7 @@ const app = Vue.createApp({
         
 
           },
-        // m2() {
-        //     document.getElementById("humi").innerHTML='M2!';
-        // },
+ 
         sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
         },
@@ -273,32 +318,32 @@ const app = Vue.createApp({
             }
             
         },
-        addOneData() {
-          let n = 5
-          let day = 0
-          newPoint = 40*Math.random()
+        // addOneData() {
+        //   let n = 5
+        //   let day = 0
+        //   newPoint = 40*Math.random()
           
      
-            while (n>0){
-              newDate = new Date()
+        //     while (n>0){
+        //       newDate = new Date()
 
-              newPoint = 40*Math.random()
-              newDay = Math.round(7*Math.random())
+        //       newPoint = 40*Math.random()
+        //       newDay = Math.round(7*Math.random())
 
-              this.lineChartTempOption.series[0].data.push(newPoint)
-              this.lineChartTempOption.xAxis.data.push(this.weekday[newDay] +' '+String(newDate.getHours())+':'+String(newDate.getMinutes()))
-              this.lineChartTempOption.series[0].color=this.weekdayColor[newDay]
-              n--
-              console.log(n)
+        //       this.lineChartTempOption.series[0].data.push(newPoint)
+        //       this.lineChartTempOption.xAxis.data.push(this.weekday[newDay] +' '+String(newDate.getHours())+':'+String(newDate.getMinutes()))
+        //       this.lineChartTempOption.series[0].color=this.weekdayColor[newDay]
+        //       n--
+        //       console.log(n)
 
-            }
-            // console.log(day)
+        //     }
+        //     // console.log(day)
             
           
 
 
-          console.log(newDate)
-        },
+        //   console.log(newDate)
+        // },
         
         querySavedDht22Data(enter_point){
           /*
@@ -320,6 +365,9 @@ const app = Vue.createApp({
                       console.log( response.data[i])
                       this.lineChartTempOption.series[0].data.push(response.data[i][1])
                       this.lineChartTempOption.xAxis.data.push(response.data[i][0])
+
+                      this.lineChartHumiOption.series[0].data.push(response.data[i][2])
+                      this.lineChartHumiOption.xAxis.data.push(response.data[i][0])
                       // this.savedDht22Data_X.push(i)
                       // this.savedDht22Data_Y.push(response.data[i])
                     }
