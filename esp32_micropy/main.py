@@ -283,6 +283,8 @@ class SmartOfficeStation():
       # set a counter to count down the time
       counter = pomodoro_time
       # Make the counter count down every second
+      # self.SHOW_NET_CONFIG=False
+      # self.SERVER_RUNNING=False
       while counter >= 0:
         left_seconds = 60
         counter -= 1
@@ -301,31 +303,23 @@ class SmartOfficeStation():
           self.oled.text(f"temp:{self.dht.temperature()}C",0,30)
           self.oled.text(f"hudi:{self.dht.humidity()}%",0,40)
           self.oled.show()
-          time.sleep(1)
+          await asyncio.sleep(1) #time.sleep(1)
         
-       
-   
-
-
-
-
-
-
-      # self.oled.show()
-      # time.sleep(pomodoro_time)
-      # self.oled.fill(0)
-      # self.oled.text("Time is up!",0,0)
-      # self.oled.show()
+    
       for i in range(10):
         self.oled.fill(0)
         self.oled.text("Time is up!",0,0)
         self.oled.show()
-        time.sleep(0.5)
+        await asyncio.sleep(0.5)
         self.oled.fill(0)
         self.oled.show()
-        time.sleep(0.5)
-        # self.oled.text("Time is up!",0,0)
-        # self.oled.show()
+        await asyncio.sleep(0.5)
+    
+    #TODO: How to fill the certain line with black?
+
+
+      # self.SERVER_RUNNING=True
+      # self.SHOW_NET_CONFIG=True
   
       return "Time is up!"
     
