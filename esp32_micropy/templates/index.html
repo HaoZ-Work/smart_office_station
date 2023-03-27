@@ -94,6 +94,38 @@
       </div>
     </div>
 
+    <h1>Pomodoro </h1>
+    <!-- add 4 buttons, when user click the button, it will trigger the Pomodoro api -->
+ 
+    <div class="container-fluid"> 
+      <div class="row">
+        <div class="col-md-3"  >
+          <button class="btn btn-primary" v-on:click="startPomodoro(5)">5 mins</button>
+        </div>
+      
+        <div class="col-md-3"  >
+          <button class="btn btn-primary" v-on:click="startPomodoro(15)">15 mins</button>
+        
+        </div>
+
+        <div class="col-md-3" >
+          <button class="btn btn-primary" v-on:click="startPomodoro(30)">30 mins</button>
+        </div>
+
+        <div class="col-md-3" >
+          <button class="btn btn-primary" v-on:click="startPomodoro(60)">60 mins</button>
+        </div>
+
+
+      </div>
+    </div>
+      
+
+
+
+
+
+
 
   </div>
 
@@ -230,6 +262,21 @@ const app = Vue.createApp({
         getNetworkIp(){
             this.ip=document.getElementById("ip").innerText
             console.log(this.ip)
+        },
+        startPomodoro(time){
+            var config = {
+                method: 'get',
+                url: 'http://'+this.ip+'/pomodoro/'+time,
+                headers: {} };
+            
+                axios(config)
+                    .then(function (response) {
+                        console.log(response.data);
+                    })
+                    .catch(function (error) {
+                    console.log(error);
+                    });
+                
         },
 
         QueryData(enter_point,){
