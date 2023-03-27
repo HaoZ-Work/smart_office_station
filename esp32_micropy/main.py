@@ -255,25 +255,91 @@ class SmartOfficeStation():
       The path for returning saved dht22 data from local json file.
       
       '''
-      # with open(DHTRECORDING,"r") as dump_file:
-      #   dht_recording = ujson.load(dump_file)
-      #   print(f"Loaded data:{dht_recording}")
-      #   dump_file.close()
-      # print("Send dumped data via GET.")
+      
 
       dht_recording = []
-      with open('DHT_recording.csv','r') as file:
+      with open(DHTRECORDING,'r') as file:
         for line in file:
           line_Str=file.readline()
-          print(line_Str)
+          #print(line_Str)
           line_Str=line_Str.rstrip('\n')
           line_Str=line_Str.rstrip('\r')
           dht_recording.append(line_Str.split(','))
+        file.close()
 
-      return dht_recording
-      # if request.method =='GET':
+      ##TODO: Return whole list will run out of of RAM
+      ##  how to return the whole list?
+
+      #return 1 of 3 points of dht_recording
+      return dht_recording[:60]
+  
+    # set an endpoint to implement the pomodoro timer with variable pomodoro_time,
+    @app.route('/pomodoro/<int:pomodoro_time>', methods=['GET'])
+    async def pomodoro_enterpoint(request,pomodoro_time):
+      '''
+      When time goes up, it will show "Time is up!" and blink on the screen
+      '''
+      # fill the first three lines with black
+      # set a counter to count down the time
+      counter = pomodoro_time
+      # Make the counter count down every second
+      while counter >= 0:
+        left_seconds = 60
+        counter -= 1
+        if counter <0:
+          break
+        while left_seconds >0:
+          self.oled.fill(0)
+
+          left_seconds -= 1
+          self.oled.text(f"Pomodoroing",0,0)
+
+          self.oled.text(f"Time:{pomodoro_time} mins",0,10)
+          self.oled.text(f"Time left:{counter}:{left_seconds}",0,20)
+          
+          self.dht.measure()
+          self.oled.text(f"temp:{self.dht.temperature()}C",0,30)
+          self.oled.text(f"hudi:{self.dht.humidity()}%",0,40)
+          self.oled.show()
+          time.sleep(1)
         
-      #   return dht_recording
+       
+   
+
+
+
+
+
+
+      # self.oled.show()
+      # time.sleep(pomodoro_time)
+      # self.oled.fill(0)
+      # self.oled.text("Time is up!",0,0)
+      # self.oled.show()
+      for i in range(10):
+        self.oled.fill(0)
+        self.oled.text("Time is up!",0,0)
+        self.oled.show()
+        time.sleep(0.5)
+        self.oled.fill(0)
+        self.oled.show()
+        time.sleep(0.5)
+        # self.oled.text("Time is up!",0,0)
+        # self.oled.show()
+  
+      return "Time is up!"
+    
+
+    
+  
+    
+    
+    
+
+      
+
+
+ 
 
     # @app.route('/ifconfig', methods=['GET'])
     # def netconfig_enterpoint(request):
@@ -310,7 +376,7 @@ class SmartOfficeStation():
     asyncio.run(start_async_server())
     # print("end")
     
-    
+
   def _client(self,func, delay):
     '''
     A client to hold some functions and make them run while server is running.
@@ -352,55 +418,7 @@ class SmartOfficeStation():
     self.oled.show()
 
     
-  # def _dumpdht22(self):
-  #   '''
-  #   Write current data from dht22 sensor to json file.
-  #   recording example: {'Fri 11:27:38': {'humidity': 35.4, 'temperature': 27.5}}
-  #   '''
-  #   weekday={
-  #         "Sunday":"Sun",
-  #         "Monday":"Mon",
-  #         "Tuesday":"Tues",
-  #         "Wednesday":"Wed",
-  #         "Thursday":"Thur",
-  #         "Friday":"Fri",
-  #         "Saturday":"Sat"
-  #   }
-  #   with open(DHTRECORDING,"r") as dump_file:
-  #       dht_recording = ujson.load(dump_file)
-  #       #print(f"Loaded data:{dht_recording}")
-  #       dump_file.close()
-  #   with open(DHTRECORDING,"w") as dump_file:
-  #     self.dht.measure()
-  #     # localtime = time.localtime(time.time())
-     
-  #     date = requests.get(url="https://www.timeapi.io/api/Time/current/zone?timeZone="+self.config["TIMEZONE"])
-  #     print(date.json()['time'])
-
-  #     date = weekday[date.json()['dayOfWeek']]+' '+ date.json()['time']
-
-  #     # dump_data ={
-  #     #   date:{
-  #     #   'temperature':self.dht.temperature(),
-  #     #   'humidity':self.dht.humidity(),
-
-  #     # }
-  #     # }
-
-  #     dht_recording[date] = {
-  #       'temperature':self.dht.temperature(),
-  #       'humidity':self.dht.humidity(),
-  #     }
-  #     if len(dht_recording) > 168: ## 2106 is 7*24*12,means record it each 5mins for a week. TODO: should be in config.
-  #       dht_recording_list = list(dht_recording.keys())
-  #       dht_recording_list.sort()
-  #       print(f"---deleted:{dht_recording_list[0]}---")
-
-  #       dht_recording.pop( dht_recording_list[0] )
-  #       #print(f"new after deleting:{dht_recording}")
-  #     ujson.dump(dht_recording,dump_file)
-  #     dht_recording= 0
-  #     dump_file.close()
+  
   
   
   
