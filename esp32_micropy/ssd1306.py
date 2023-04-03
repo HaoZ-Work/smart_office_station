@@ -89,7 +89,17 @@ class SSD1306:
 
     def fill(self, col):
         self.framebuf.fill(col)
+        
+    def fill_rect(self, x, y, w, h, col):
+        self.framebuf.fill_rect(x, y, w, h, col)
+    def fill_line(self,  y,  col):
+        '''fill a line with color col
+        y: y coordinate of line, 0 means first line, 10 second line, etc.
+        col: color of line
+        '''
+        self.framebuf.fill_rect(0, y, 135, 10, col)
 
+        
     def pixel(self, x, y, col):
         self.framebuf.pixel(x, y, col)
 
