@@ -37,6 +37,9 @@ class SmartOfficeStation():
      self._oled_init()
      self._wifi_connect()
      self._dht_init()
+     self.SHOW_NET_CONFIG=True
+     self.SERVER_RUNNING=True
+     
 
   def _load_config(self):
     '''
@@ -221,7 +224,6 @@ class SmartOfficeStation():
       The enter point of main html page.
       '''
       if request.method == 'GET':
-            # self.dht.measure() ## TODO: keep updating even without web user?
         return render_template('index.html',ip=self.netconfig[0])
 
     @app.route('/dht22', methods=['GET'])
@@ -231,13 +233,9 @@ class SmartOfficeStation():
       
       '''
       self.dht.measure()
-      self.oled.fill(0)
-      if self.SHOW_NET_CONFIG==True:
-            self.oled.text("WiFi connected.",0,0)
-            self.oled.text(f"{self.netconfig[0]}",0,20)
-      if self.SERVER_RUNNING==True:
-            self.oled.text("Server is on:",0,10)
 
+      self.oled.fill_line(30,0)
+      self.oled.fill_line(40,0)
       self.oled.text(f"temp:{self.dht.temperature()}C",0,30)
       self.oled.text(f"hudi:{self.dht.humidity()}%",0,40)
       self.oled.show()
@@ -283,57 +281,31 @@ class SmartOfficeStation():
       # set a counter to count down the time
       counter = pomodoro_time
       # Make the counter count down every second
-      # self.SHOW_NET_CONFIG=False
-      # self.SERVER_RUNNING=False
+    
       while counter >= 0:
         left_seconds = 60
         counter -= 1
         if counter <0:
           break
         while left_seconds >0:
-          self.oled.fill(0)
-
+          self.oled.fill_line(50,0)
           left_seconds -= 1
-          self.oled.text(f"Pomodoroing",0,0)
-
-          self.oled.text(f"Time:{pomodoro_time} mins",0,10)
-          self.oled.text(f"Time left:{counter}:{left_seconds}",0,20)
-          
-          self.dht.measure()
-          self.oled.text(f"temp:{self.dht.temperature()}C",0,30)
-          self.oled.text(f"hudi:{self.dht.humidity()}%",0,40)
+          self.oled.text(f"Time left:{counter}:{left_seconds}",0,50)
           self.oled.show()
           await asyncio.sleep(1) #time.sleep(1)
         
     
       for i in range(10):
-        self.oled.fill(0)
-        self.oled.text("Time is up!",0,0)
+        self.oled.fill_line(50,0)
+        self.oled.text("Time is up!",0,50)
         self.oled.show()
         await asyncio.sleep(0.5)
-        self.oled.fill(0)
+        self.oled.fill_line(50,0)
         self.oled.show()
         await asyncio.sleep(0.5)
-    
-    #TODO: How to fill the certain line with black?
-
-
-      # self.SERVER_RUNNING=True
-      # self.SHOW_NET_CONFIG=True
   
       return "Time is up!"
     
-
-    
-  
-    
-    
-    
-
-      
-
-
- 
 
     # @app.route('/ifconfig', methods=['GET'])
     # def netconfig_enterpoint(request):
@@ -341,10 +313,6 @@ class SmartOfficeStation():
     #   }
     #   return netconfig
 
-    self.oled.text("Server is on:",0,10)
-    self.oled.show()
-    print("Running server..")
-    self.SERVER_RUNNING=True
 
 
     async def start_async_server():
@@ -394,19 +362,19 @@ class SmartOfficeStation():
     return wrapper
 
   
-  # @_client(delay=30)
   def _querydht22(self):
     '''
      This function will make device refresh data via dht22 and make them display on monitor
     '''
     self.dht.measure()
-    self.oled.fill(0)
     if self.SHOW_NET_CONFIG==True:
             self.oled.text("WiFi connected.",0,0)
             self.oled.text(f"{self.netconfig[0]}",0,20)
     if self.SERVER_RUNNING==True:
             self.oled.text("Server is on:",0,10)
 
+    self.oled.fill_line(30,0)
+    self.oled.fill_line(40,0)
     self.oled.text(f"temp:{self.dht.temperature()}C",0,30)
     self.oled.text(f"hudi:{self.dht.humidity()}%",0,40)
     self.oled.show()
@@ -476,13 +444,6 @@ class SmartOfficeStation():
         #dump_file.close()
     
 
-  
-   
-
-        
- 
-
-
   def _oled_init(self):
     '''
     Initialized the olde monitor
@@ -492,8 +453,7 @@ class SmartOfficeStation():
     oled_height = self.config["OLED_HEIGHT"]
     oled = ssd1306.SSD1306_I2C(oled_width, oled_height, i2c)
     self.oled = oled
-    # oled.text("Connecting...",0,0)
-    # oled.show()
+  
 
 
 
