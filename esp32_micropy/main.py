@@ -1,12 +1,13 @@
-import os
+# import os
 import urequests as requests
 import network
 import time
 import dht
 import machine
 import ujson
-import socket
+# import socket
 import gc
+
 
 try:
     import uasyncio as asyncio
@@ -17,11 +18,10 @@ from machine import Pin, SoftI2C,SPI
 import ssd1306
 
 from microdot import Microdot, Response,send_file
-import uasyncio as asyncio
 
 from microdot_asyncio import Microdot as async_Microdot
 
-from microdot_utemplate import render_template,init_templates
+from microdot_utemplate import render_template
 
 
 CONFIG_PATH = './config.json'
@@ -254,6 +254,7 @@ class SmartOfficeStation():
       
       '''
       
+      gc.collect()
 
       dht_recording = []
       with open(DHTRECORDING,'r') as file:
@@ -265,11 +266,14 @@ class SmartOfficeStation():
           dht_recording.append(line_Str.split(','))
         file.close()
 
-      ##TODO: Return whole list will run out of of RAM
-      ##  how to return the whole list?
 
-      #return 1 of 3 points of dht_recording
-      return dht_recording[:60]
+
+      self.print_memory_usage()
+
+      # Take 42 points evenly from the list
+      dht_recording=dht_recording[::int(len(dht_recording)/42)]
+
+      return dht_recording
   
     # set an endpoint to implement the pomodoro timer with variable pomodoro_time,
     @app.route('/pomodoro/<int:pomodoro_time>', methods=['GET'])
@@ -453,6 +457,15 @@ class SmartOfficeStation():
     oled_height = self.config["OLED_HEIGHT"]
     oled = ssd1306.SSD1306_I2C(oled_width, oled_height, i2c)
     self.oled = oled
+  
+  def print_memory_usage(self):
+    free_memory = gc.mem_free()
+    allocated_memory = gc.mem_alloc()
+    total_memory = free_memory + allocated_memory
+
+    print("Free memory: {} bytes".format(free_memory))
+    print("Allocated memory: {} bytes".format(allocated_memory))
+    print("Total memory: {} bytes".format(total_memory))
   
 
 
