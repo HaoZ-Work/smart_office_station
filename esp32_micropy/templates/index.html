@@ -264,6 +264,8 @@ const app = Vue.createApp({
             console.log(this.ip)
         },
         startPomodoro(time){
+          alert("Please don't refresh page during the pomodoro time!");
+
             var config = {
                 method: 'get',
                 url: 'http://'+this.ip+'/pomodoro/'+time,
