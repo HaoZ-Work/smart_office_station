@@ -1,11 +1,9 @@
-# import os
+import os
 import urequests as requests
 import network
 import time
-import dht
-import machine
+from dht20 import DHT20
 import ujson
-# import socket
 import gc
 
 
@@ -14,7 +12,7 @@ try:
 except ImportError:
     import asyncio
 
-from machine import Pin, SoftI2C,SPI
+from machine import Pin, SoftI2C
 import ssd1306
 
 from microdot import Microdot, Response,send_file
@@ -22,6 +20,7 @@ from microdot import Microdot, Response,send_file
 from microdot_asyncio import Microdot as async_Microdot
 
 from microdot_utemplate import render_template
+
 
 
 CONFIG_PATH = './config.json'
@@ -39,6 +38,7 @@ class SmartOfficeStation():
      self._dht_init()
      self.SHOW_NET_CONFIG=True
      self.SERVER_RUNNING=True
+     
      
 
   def _load_config(self):
@@ -187,6 +187,8 @@ class SmartOfficeStation():
       self.oled.text(f"Please restart ",0,20)
       self.oled.text(f"the device and",0,30)
       self.oled.text(f"try again",0,40)
+
+
       self.oled.show()
 
       assert False, "Wifi is not available."
@@ -203,13 +205,20 @@ class SmartOfficeStation():
 
   def _dht_init(self):
     '''
-    Initialize the dht22 sensor
+    Initialize the dht sensor 
     
     '''
-    # print(self.config)
-    self.dht = dht.DHT22(machine.Pin(self.config["DHT_DATA_PIN"]))
+    i2c0_sda = Pin(21)
+    i2c0_scl = Pin(22)
+    i2c0 = SoftI2C(sda=i2c0_sda, scl=i2c0_scl)
 
-  
+    self.dht = DHT20(i2c0)
+    self.dht.measure()
+ 
+
+    
+
+    
 
 
   def server(self):
@@ -233,12 +242,6 @@ class SmartOfficeStation():
       
       '''
       self.dht.measure()
-
-      self.oled.fill_line(30,0)
-      self.oled.fill_line(40,0)
-      self.oled.text(f"temp:{self.dht.temperature()}C",0,30)
-      self.oled.text(f"hudi:{self.dht.humidity()}%",0,40)
-      self.oled.show()
       dht_data = {
         'temperature':self.dht.temperature(),
         'humidity':self.dht.humidity(),
@@ -285,7 +288,7 @@ class SmartOfficeStation():
       # set a counter to count down the time
       counter = pomodoro_time
       # Make the counter count down every second
-    
+
       while counter >= 0:
         left_seconds = 60
         counter -= 1
@@ -295,6 +298,7 @@ class SmartOfficeStation():
           self.oled.fill_line(50,0)
           left_seconds -= 1
           self.oled.text(f"Time left:{counter}:{left_seconds}",0,50)
+
           self.oled.show()
           await asyncio.sleep(1) #time.sleep(1)
         
@@ -371,6 +375,9 @@ class SmartOfficeStation():
      This function will make device refresh data via dht22 and make them display on monitor
     '''
     self.dht.measure()
+    self.currnet_temp = self.dht.temperature()
+    self.current_hudi = self.dht.humidity()
+
     if self.SHOW_NET_CONFIG==True:
             self.oled.text("WiFi connected.",0,0)
             self.oled.text(f"{self.netconfig[0]}",0,20)
@@ -379,8 +386,8 @@ class SmartOfficeStation():
 
     self.oled.fill_line(30,0)
     self.oled.fill_line(40,0)
-    self.oled.text(f"temp:{self.dht.temperature()}C",0,30)
-    self.oled.text(f"hudi:{self.dht.humidity()}%",0,40)
+    self.oled.text(f"temp:{self.currnet_temp}C",0,30)
+    self.oled.text(f"hudi:{self.current_hudi}%",0,40)
     self.oled.show()
 
     
@@ -453,6 +460,8 @@ class SmartOfficeStation():
     Initialized the olde monitor
     '''
     i2c = SoftI2C(scl=Pin(self.config["OLED_SCL"]), sda=Pin(self.config["OLED_SDA"]))
+
+    # i2c = I2C(scl=Pin(self.config["OLED_SCL"]), sda=Pin(self.config["OLED_SDA"]))
     oled_width = self.config["OLED_WIDTH"]
     oled_height = self.config["OLED_HEIGHT"]
     oled = ssd1306.SSD1306_I2C(oled_width, oled_height, i2c)
