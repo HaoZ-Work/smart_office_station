@@ -461,7 +461,6 @@ class SmartOfficeStation():
     '''
     i2c = SoftI2C(scl=Pin(self.config["OLED_SCL"]), sda=Pin(self.config["OLED_SDA"]))
 
-    # i2c = I2C(scl=Pin(self.config["OLED_SCL"]), sda=Pin(self.config["OLED_SDA"]))
     oled_width = self.config["OLED_WIDTH"]
     oled_height = self.config["OLED_HEIGHT"]
     oled = ssd1306.SSD1306_I2C(oled_width, oled_height, i2c)
