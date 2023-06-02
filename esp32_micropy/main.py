@@ -2,7 +2,6 @@ import os
 import urequests as requests
 import network
 import time
-from dht20 import DHT20
 import ujson
 import gc
 
@@ -13,14 +12,16 @@ except ImportError:
     import asyncio
 
 from machine import Pin, SoftI2C
-import ssd1306
+
+import libs.ssd1306 as ssd1306
 
 from microdot import Microdot, Response,send_file
 
-from microdot_asyncio import Microdot as async_Microdot
+from libs.microdot_asyncio import Microdot as async_Microdot
 
-from microdot_utemplate import render_template
+from libs.microdot_utemplate import render_template
 
+from libs.dht20 import DHT20
 
 
 CONFIG_PATH = './config.json'
