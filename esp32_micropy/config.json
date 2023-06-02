@@ -1,6 +1,6 @@
 {
-    "SSID":"H2G",
-    "SSID_PASS":"zh970201",
+    "SSID":"test",
+    "SSID_PASS":"test",
     "DEV_ID":"00001",
     "DHT_DATA_PIN":14,
     "OLED_SDA":21,
