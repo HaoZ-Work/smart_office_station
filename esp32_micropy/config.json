@@ -1,6 +1,6 @@
 {
     "SSID":"test",
-    "SSID_PASS":"test",
+    "SSID_PASS":"testps",
     "DEV_ID":"00001",
     "DHT_DATA_PIN":14,
     "OLED_SDA":21,
