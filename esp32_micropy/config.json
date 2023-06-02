@@ -1,0 +1,11 @@
+{
+    "SSID":"test",
+    "SSID_PASS":"test",
+    "DEV_ID":"00001",
+    "DHT_DATA_PIN":14,
+    "OLED_SDA":21,
+    "OLED_SCL":22,
+    "OLED_WIDTH":128,
+    "OLED_HEIGHT":64,
+    "TIMEZONE":"Europe/Berlin"
+}
