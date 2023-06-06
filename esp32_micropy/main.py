@@ -23,6 +23,8 @@ from libs.microdot_utemplate import render_template
 
 from libs.dht20 import DHT20
 
+import libs.sh1106 as sh1106
+
 
 CONFIG_PATH = './config.json'
 # WIFI_SETUP_TEMPLATE = './WiFi_setup.html'
@@ -464,7 +466,9 @@ class SmartOfficeStation():
 
     oled_width = self.config["OLED_WIDTH"]
     oled_height = self.config["OLED_HEIGHT"]
-    oled = ssd1306.SSD1306_I2C(oled_width, oled_height, i2c)
+    # oled = ssd1306.SSD1306_I2C(oled_width, oled_height, i2c)
+    oled = sh1106.SH1106_I2C(oled_width, oled_height, i2c, None, 0x3c)
+
     self.oled = oled
   
   def print_memory_usage(self):
