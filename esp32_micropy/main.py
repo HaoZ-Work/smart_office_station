@@ -21,8 +21,8 @@ from libs.microdot_asyncio import Microdot as async_Microdot
 
 from libs.microdot_utemplate import render_template
 
-from libs.dht20 import DHT20
-
+# from libs.dht20 import DHT20
+from libs.htu21d.htu21d import HTU21D as DHT20
 
 CONFIG_PATH = './config.json'
 # WIFI_SETUP_TEMPLATE = './WiFi_setup.html'
