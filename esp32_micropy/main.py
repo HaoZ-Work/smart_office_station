@@ -275,7 +275,7 @@ class SmartOfficeStation():
       self.print_memory_usage()
 
       # Take 42 points evenly from the list
-      dht_recording=dht_recording[::int(len(dht_recording)/42)]
+      # dht_recording=dht_recording[::int(len(dht_recording)/42)]
 
       return dht_recording
   
