@@ -13,6 +13,10 @@ do
     echo "*****Upload files to device: $device *****"
     for file in esp32_micropy/*
     do
+        if [[ $file == *"config.json" ]]; then
+            new_uuid=$(uuidgen)
+            jq --arg uuid "$new_uuid" '.DEV_ID = $uuid' $file > "temp.json" && mv "temp.json" $file
+        fi
         echo "Uploading file: $file to device: $device"
         ampy --port $device put $file
     done
