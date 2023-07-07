@@ -1,10 +1,10 @@
 ## Smart office station
-### Set up development environment
+### 1. Set up development environment
 
-#### (1) Download the micropython from http://www.micropython.org/download/esp32/ , the current version is `v1.19.1 (2022-06-18)`
+#### (1) Download the micropython from http://www.micropython.org/download/esp32spiram/ , the current version is `v1.19.1 (2022-06-18)`
 #### (2) Install micropython on ESP32 
 >  esptool --chip esp32 --port /dev/ttyUSB0 erase_flash
->  esptool --chip esp32 --port /dev/ttyUSB0 --baud 460800 write_flash -z 0x1000 esp32-20220618-v1.19.1.bin
+>  esptool --chip esp32 --port /dev/ttyUSB0 --baud 460800 write_flash -z 0x1000 esp32spiram-20220618-v1.19.1.bin 
 
 #### (3) Verify if Micropython is installed correctly.
 >  Notice that the speed of rate should be `115200` instead of `9600` when you connect to port but see nothing.
@@ -21,6 +21,9 @@
 
 #### (6) Check the `config.json` of projeck and follow or change the port number of it to connect the ESP32 with sensors.
 
+### 2. Set up env and transport code into a batch of devices. (Only tested on linux)
+> Plug in all devices with USB Port
+> run batch_setup.sh
 
 #### Hardware requirement
 > - Windows/Linux/Macos
