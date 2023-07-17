@@ -30,6 +30,9 @@
 > - ESP32
 > - Sensors:Dht22,OLED monitor
 
+#### To Use it in WSL2
+> - [Set up usb connection in WSL2](https://learn.microsoft.com/zh-cn/windows/wsl/connect-usb)
+> - sudo bash batch_setup.sh
 
 #### Reference
 > http://www.micropython.org/download/esp32/
