@@ -5,6 +5,11 @@ set_device() {
     # The device port is passed as the first argument to the function
     device=$1
     
+    # Create a temporary directory for this device
+    temp_dir="temp_$(basename $device)"
+    mkdir -p $temp_dir
+    cp -r esp32_micropy/* $temp_dir/
+
     # Record the start time
     start_time=$(date +%s)
 
@@ -19,13 +24,18 @@ set_device() {
     echo "*****Installing Micropython on device: $device finished *****"
 
     echo "*****Uploading files to device: $device *****"
-    # Iterate over all files in the esp32_micropy directory
-    for file in esp32_micropy/*
+    # Iterate over all files in the temp directory
+    for file in $temp_dir/*
     do
         # If the file is config.json, generate a new UUID and replace the DEV_ID field in the file
         if [[ $file == *"config.json" ]]; then
             new_uuid=$(uuidgen)
-            jq --arg uuid "$new_uuid" '.DEV_ID = $uuid' $file > "temp.json" && mv "temp.json" $file
+            jq --arg uuid "$new_uuid" '.DEV_ID = $uuid' $file > "$temp_dir/temp.json" && mv "$temp_dir/temp.json" $file
+        fi
+
+           # Skip files ending in .original
+        if [[ $file == *.original ]]; then
+            continue
         fi
 
         # Upload the file to the device
@@ -36,6 +46,9 @@ set_device() {
     end_time=$(date +%s)
     echo "*****Uploading files to device: $device finished *****"
     echo "Time taken: $(($end_time - $start_time)) seconds"
+
+    # Remove the temporary directory
+    rm -rf $temp_dir
 }
 
 # Record the start time of the whole script
