@@ -64,9 +64,9 @@ for package in esptool adafruit-ampy; do
     fi
 done
 
-# Get the number of CPUs for parallel processing
-cpu_num=$(nproc)
-echo "Number of CPUs: $cpu_num"
+# Get the number of devices for parallel processing
+device_num=$(ls /dev/ttyUSB* | wc -l)
+echo "Number of devices: $device_num"
 
 # Export the function for use in xargs
 export -f set_device
@@ -75,7 +75,7 @@ export -f set_device
 echo PATH="$HOME/bin:$HOME/.local/bin:$PATH"
 
 # Iterate over all devices in parallel, calling set_device for each one
-ls /dev/ttyUSB* | xargs -n 1 -P $cpu_num -I {} bash -c 'set_device "$@"' _ {}
+ls /dev/ttyUSB* | xargs -n 1 -P $device_num -I {} bash -c 'set_device "$@"' _ {}
 
 # Print the total time taken by the script
 echo "Total time taken: $SECONDS seconds"
