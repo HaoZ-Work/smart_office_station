@@ -1,4 +1,14 @@
 #!/bin/bash
+export PATH=$PATH:/home/ptwadmin/.local/bin/
+
+# Indicate script start with two quick beeps
+echo -e "\a"
+sleep 0.5
+echo -e "\a"
+sleep 0.5
+echo -e "\a"
+
+
 
 # Function to set up each ESP32 device
 set_device() {
@@ -61,21 +71,21 @@ else
     PACKAGE_MANAGER="yum"
 fi
 
-# Install necessary packages if they are not already installed
-for program in jq uuidgen python3 python3-pip; do
-    if ! which $program > /dev/null; then
-        echo "Installing $program..."
-        sudo $PACKAGE_MANAGER install -y $program
-    fi
-done
+# # Install necessary packages if they are not already installed
+# for program in jq uuidgen python3 python3-pip; do
+#     if ! which $program > /dev/null; then
+#         echo "Installing $program..."
+#         sudo $PACKAGE_MANAGER install -y $program
+#     fi
+# done
 
-# Check if the necessary Python packages are installed, install if not
-for package in esptool adafruit-ampy; do
-    if ! pip list --format=columns | grep -i $package > /dev/null; then
-        echo "Installing Python package $package..."
-        pip install $package
-    fi
-done
+# # Check if the necessary Python packages are installed, install if not
+# for package in esptool adafruit-ampy; do
+#     if ! pip list --format=columns | grep -i $package > /dev/null; then
+#         echo "Installing Python package $package..."
+#         pip install $package
+#     fi
+# done
 
 # Get the number of devices for parallel processing
 device_num=$(ls /dev/ttyUSB* | wc -l)
@@ -92,3 +102,15 @@ ls /dev/ttyUSB* | xargs -n 1 -P $device_num -I {} bash -c 'set_device "$@"' _ {}
 
 # Print the total time taken by the script
 echo "Total time taken: $SECONDS seconds"
+
+# Indicate script completion with three quick beeps
+echo -e "\a"
+sleep 0.5
+echo -e "\a"
+sleep 0.5
+echo -e "\a"
+sleep 0.5
+echo -e "\a"
+sleep 0.5
+echo -e "\a"
+
