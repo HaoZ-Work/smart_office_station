@@ -60,8 +60,16 @@ sudo blink1-tool --add_udev_rules
 blink1-tool -m 100 --rgb=255,0,255
 ```
 
+### 4. Flashing the Firmware Master 
+Only need to be executed once.
 
+## Flashing the ESP32
 
+To read the flash from an ESP32 chip, you can use the following command:
+
+```bash
+sudo esptool.py --chip esp32 --port /dev/ttyUSB0 --baud 115200 read_flash 0 ALL esp32_dump.bin
+```
 ##### Reference
 > http://www.micropython.org/download/esp32/
 > https://www.jianshu.com/p/9097920ea915
