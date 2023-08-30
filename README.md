@@ -36,27 +36,27 @@
 
 ### 3. Set up blink<1>
 
-### Clone and build the blink1-tool
+#### Clone and build the blink1-tool
 git clone https://github.com/todbot/blink1-tool
 cd blink1-tool
 make
 
-### Install required libraries and rebuild
+#### Install required libraries and rebuild
 sudo apt-get install libusb-1.0-0-dev
 make
 
-### Set up udev rules
+#### Set up udev rules
 wget https://github.com/todbot/blink1-tool/blob/main/51-blink1.rules
 sudo udevadm control --reload
 sudo udevadm trigger
 
-### Copy the tool and test the LED
+#### Copy the tool and test the LED
 cp blink1-tool/blink1-tool "$PATH:/home/..."
 sudo blink1-tool --add_udev_rules
 blink1-tool -m 100 --rgb=255,0,255
 \```
 
 
-#### Reference
+##### Reference
 > http://www.micropython.org/download/esp32/
 > https://www.jianshu.com/p/9097920ea915
