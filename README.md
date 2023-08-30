@@ -77,7 +77,24 @@ Before flashing a new firmware onto the ESP32, you need to erase the current fla
 sudo esptool.py --port /dev/ttyUSB0 erase_flash
 sudo esptool.py --chip esp32 --port /dev/ttyUSB0 --baud 115200 write_flash 0x00000 esp32_dump.bin
 ```
+### 5. Set up PATH in shell files
+Change to the appropriate PATH
+#### (1)batch_setup.sh
 
+#### Add the local bin directory to the PATH for this script
+```bash
+export PATH=$PATH:/home/ptw/.local/bin   
+```
+#### (2)batch_setup.sh
+
+#### Define the location of the log file
+```bash
+LOG_FILE="/home/ptw/Schreibtisch/smart/smart_office_station/logfile.log"        
+```
+#### Run batch_setup.sh 
+```bash
+sudo -u ptw bash -c "cd /home/ptw/Schreibtisch/smart/smart_office_station; bash batch_setup.sh"  # Optionally, redirect output to the log file: >> $LOG_FILE 2>&1
+```
 
 
 ##### Reference
