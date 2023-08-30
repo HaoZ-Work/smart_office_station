@@ -43,18 +43,22 @@ cd blink1-tool
 make
 ```
 #### Install required libraries and rebuild
+```bash
 sudo apt-get install libusb-1.0-0-dev
 make
-
+```
 #### Set up udev rules
+```bash
 wget https://github.com/todbot/blink1-tool/blob/main/51-blink1.rules
 sudo udevadm control --reload
 sudo udevadm trigger
-
+```
 #### Copy the tool and test the LED
+```bash
 cp blink1-tool/blink1-tool "$PATH:/home/..."
 sudo blink1-tool --add_udev_rules
 blink1-tool -m 100 --rgb=255,0,255
+```
 \```
 
 
