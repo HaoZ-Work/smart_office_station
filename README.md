@@ -37,10 +37,11 @@
 ### 3. Set up blink<1>
 
 #### Clone and build the blink1-tool
+```bash
 git clone https://github.com/todbot/blink1-tool
 cd blink1-tool
 make
-
+```
 #### Install required libraries and rebuild
 sudo apt-get install libusb-1.0-0-dev
 make
