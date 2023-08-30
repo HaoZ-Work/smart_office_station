@@ -62,14 +62,14 @@ blink1-tool -m 100 --rgb=255,0,255
 
 ### 4. Flashing the Firmware Master and copy to new ESP32
 
-#### (1)Flashing the ESP32 Firmware Master 
+#### (1) Flashing the ESP32 Firmware Master 
 Only need to be executed once.
 To read the flash from an ESP32 chip, you can use the following command:
 
 ```bash
 sudo esptool.py --chip esp32 --port /dev/ttyUSB0 --baud 115200 read_flash 0 ALL esp32_dump.bin
 ```
-#### (2)Flashing the Firmware onto ESP32
+#### (2) Flashing the Firmware onto ESP32
 
 Before flashing a new firmware onto the ESP32, you need to erase the current flash. After erasing, you can then write the new firmware:
 
@@ -79,13 +79,13 @@ sudo esptool.py --chip esp32 --port /dev/ttyUSB0 --baud 115200 write_flash 0x000
 ```
 ### 5. Set up PATH in shell files
 Change to the appropriate PATH
-#### (1)batch_setup.sh
+#### (1) batch_setup.sh
 
 #### Add the local bin directory to the PATH for this script
 ```bash
 export PATH=$PATH:/home/ptw/.local/bin   
 ```
-#### (2)batch_setup.sh
+#### (2) batch_setup.sh
 
 #### Define the location of the log file
 ```bash
@@ -95,6 +95,9 @@ LOG_FILE="/home/ptw/Schreibtisch/smart/smart_office_station/logfile.log"
 ```bash
 sudo -u ptw bash -c "cd /home/ptw/Schreibtisch/smart/smart_office_station; bash batch_setup.sh"  # Optionally, redirect output to the log file: >> $LOG_FILE 2>&1
 ```
+
+### 6. Run the Program
+> - bash usb_monitor.sh
 
 
 ##### Reference
