@@ -103,7 +103,9 @@ bash usb_monitor.sh
 
 ### 7. Rules of usb light
 > -Copying: red
+>
 > -Copy succeed: green
+> 
 > -Standby: white
 
 Caution! Start the program before plugging in the ESP32 USB. Only insert when the light turns white.
