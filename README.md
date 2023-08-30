@@ -62,14 +62,14 @@ blink1-tool -m 100 --rgb=255,0,255
 
 ### 4. Flashing the Firmware Master and copy to new ESP32
 
-### (1)Flashing the ESP32 Firmware Master 
+#### (1)Flashing the ESP32 Firmware Master 
 Only need to be executed once.
 To read the flash from an ESP32 chip, you can use the following command:
 
 ```bash
 sudo esptool.py --chip esp32 --port /dev/ttyUSB0 --baud 115200 read_flash 0 ALL esp32_dump.bin
 ```
-### (2)Flashing the Firmware onto ESP32
+#### (2)Flashing the Firmware onto ESP32
 
 Before flashing a new firmware onto the ESP32, you need to erase the current flash. After erasing, you can then write the new firmware:
 
