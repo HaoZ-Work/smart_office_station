@@ -59,7 +59,7 @@ cp blink1-tool/blink1-tool "$PATH:/home/..."
 sudo blink1-tool --add_udev_rules
 blink1-tool -m 100 --rgb=255,0,255
 ```
-\```
+
 
 
 ##### Reference
