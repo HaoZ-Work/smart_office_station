@@ -97,8 +97,16 @@ sudo -u ptw bash -c "cd /home/ptw/Schreibtisch/smart/smart_office_station; bash 
 ```
 
 ### 6. Run the Program
-> - bash usb_monitor.sh
+```bash
+bash usb_monitor.sh
+```
 
+### 7. Rules of usb light
+Copying: red
+Copy succeed: green
+Standby: white
+
+Caution! Start the program before plugging in the ESP32 USB. Only insert when the light turns white.
 
 ##### Reference
 > http://www.micropython.org/download/esp32/
