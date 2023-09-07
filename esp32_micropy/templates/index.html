@@ -1,134 +1,91 @@
 {% args ip %}
-<html>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.3.3"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue-echarts@6.2.3"></script>
-
-
-
-
-
+<html lang="en">
 <head>
-    <!-- <meta http-equiv="refresh" content="5"> -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SmartOfficeStation</title>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
+<style>
+    .logo img {
+        width: 100%; /* Makes image responsive */
+        height: auto;
+    }
+    .chart-container {
+        width: 100%;
+        height: 400px;
+    }
+</style>
 </head>
-
 <body>
-<!-- <div class="container ">
-    <hr size=20 color=#b90f22> <hr size=4 color=#000000>
-    <center><img src='https://www.ptw.tu-darmstadt.de/media/fachgebietptw/grafikenundfotos/logos_2/PTW_Logo.svg'  ></center> 
- 
-    <hr size=20 color=#b90f22> <hr size=4 color=#000000>
-  </div> -->
+  <p id="ip" hidden>{{ip}}</p>
+
 
   <div class="container ">
-    <hr size=20 color=#b90f22>
-    <hr size=4 color=#000000>
-    <div class="logo">
-    <img  src='https://github.com/HaoZ-Work/smart_office_station/blob/main/esp32_micropy/src/PTW_Logo.png?raw=true'   />
-    </div>
- 
-    <hr size=20 color=#b90f22>
-    <hr size=4 color=#000000>
+    <hr size=20 color=#b90f22> <hr size=4 color=#000000>
+    <center>        
+      <img src='https://github.com/HaoZ-Work/smart_office_station/blob/main/esp32_micropy/src/PTW_Logo.png?raw=true' width=340 height=140 />
+    </center> 
+    <hr size=20 color=#b90f22> <hr size=4 color=#000000>
   </div>
 
 
-
-
-
-    <p id="ip" hidden>{{ip}}</p>
-
-  
-  <div id="app" class="container mt-3">
-
+<div id="app" class="container mt-3">
     <h1>Sensor Data</h1>
-    <table hidden class="table">
-      <thead>
-        <tr>
-          
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td >Dht22 sensor</td>
-          <td  >
-            <p id="temp">temperature: </p>
-            <p id="humi">humidity:</p>
-            
-        </td>
-  
-        </tr>
-
-      
-
-      </tbody>
-    </table>
-    <div class="container-fluid"> 
-      <div class="row">
-        <div class="col-md-6"  style="width: 400px;height:400px;">
-          <v-chart  :option="temp_option" />
-        </div>
-
-        <div class="col-md-6"  style="width: 400px;height:400px;">
-          <v-chart  :option="humi_option" />
-        </div>
-
-        
-        <div class="col-md-6"  style="width: 8000px;height:400px;">
-          <v-chart  :option="lineChartTempOption" />
-        </div>
-         
-        <div class="col-md-6"  style="width: 8000px;height:400px;">
-          <v-chart  :option="lineChartHumiOption" />
-        </div> 
-   
-        
-        <!-- <button :onclick="addOneData">add one point</button> -->
-
-
-      </div>
+    <div class="table-responsive"> 
+        <table hidden class="table">
+            <!-- ... table contents ... -->
+        </table>
     </div>
 
-    <h1>Pomodoro </h1>
-    <!-- add 4 buttons, when user click the button, it will trigger the Pomodoro api -->
- 
-    <div class="container-fluid"> 
-      <div class="row">
-        <div class="col-md-3">
-          <button class="btn btn-primary" v-on:click="startPomodoro(5)" :disabled="isButtonDisabled">5 mins</button>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6 chart-container">
+                <v-chart :option="temp_option" style="width: 100%; height: 100%;" />
+            </div>
+
+            <div class="col-md-6 chart-container">
+                <v-chart :option="humi_option" style="width: 100%; height: 100%;" />
+            </div>
+
+            <div class="col-md-6 chart-container">
+                <v-chart :option="lineChartTempOption" style="width: 100%; height: 100%;" />
+            </div>
+
+            <div class="col-md-6 chart-container">
+                <v-chart :option="lineChartHumiOption" style="width: 100%; height: 100%;" />
+            </div>
         </div>
-      
-        <div class="col-md-3">
-          <button class="btn btn-primary" v-on:click="startPomodoro(15)" :disabled="isButtonDisabled">15 mins</button>
-        </div>
-  
-        <div class="col-md-3">
-          <button class="btn btn-primary" v-on:click="startPomodoro(30)" :disabled="isButtonDisabled">30 mins</button>
-        </div>
-  
-        <div class="col-md-3">
-          <button class="btn btn-primary" v-on:click="startPomodoro(60)" :disabled="isButtonDisabled">60 mins</button>
-        </div>
-      </div>
     </div>
-      
 
-
-
-
-
-
-
+    <h1>Pomodoro</h1>
+    <div class="container-fluid"> 
+      <div class="row mb-3">
+          <div class="col-6">
+              <button class="btn btn-primary w-100" v-on:click="startPomodoro(5)" :disabled="isButtonDisabled">5 mins</button>
+          </div>
+          <div class="col-6">
+              <button class="btn btn-primary w-100" v-on:click="startPomodoro(15)" :disabled="isButtonDisabled">15 mins</button>
+          </div>
+      </div>
+      <div class="row">
+          <div class="col-6">
+              <button class="btn btn-primary w-100" v-on:click="startPomodoro(30)" :disabled="isButtonDisabled">30 mins</button>
+          </div>
+          <div class="col-6">
+              <button class="btn btn-primary w-100" v-on:click="startPomodoro(60)" :disabled="isButtonDisabled">60 mins</button>
+          </div>
+      </div>
   </div>
+  
+  
+</div>
 
-
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.3.3"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue-echarts@6.2.3"></script>
+<!-- ... your JavaScript code ... -->
 </body>
-
 </html>
 
 <style> 
@@ -465,7 +422,7 @@ app.mount('#app')
 
 </script>
 
-<style>
+<!-- <style>
 .logo {
   display: flex;
   justify-content: center;
@@ -481,5 +438,5 @@ app.mount('#app')
       height: auto;
       align-items: center;
       justify-content: center;
-} */
+} */ -->
 
