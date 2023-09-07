@@ -99,24 +99,21 @@
  
     <div class="container-fluid"> 
       <div class="row">
-        <div class="col-md-3"  >
-          <button class="btn btn-primary" v-on:click="startPomodoro(5)">5 mins</button>
+        <div class="col-md-3">
+          <button class="btn btn-primary" v-on:click="startPomodoro(5)" :disabled="isButtonDisabled">5 mins</button>
         </div>
       
-        <div class="col-md-3"  >
-          <button class="btn btn-primary" v-on:click="startPomodoro(15)">15 mins</button>
-        
+        <div class="col-md-3">
+          <button class="btn btn-primary" v-on:click="startPomodoro(15)" :disabled="isButtonDisabled">15 mins</button>
         </div>
-
-        <div class="col-md-3" >
-          <button class="btn btn-primary" v-on:click="startPomodoro(30)">30 mins</button>
+  
+        <div class="col-md-3">
+          <button class="btn btn-primary" v-on:click="startPomodoro(30)" :disabled="isButtonDisabled">30 mins</button>
         </div>
-
-        <div class="col-md-3" >
-          <button class="btn btn-primary" v-on:click="startPomodoro(60)">60 mins</button>
+  
+        <div class="col-md-3">
+          <button class="btn btn-primary" v-on:click="startPomodoro(60)" :disabled="isButtonDisabled">60 mins</button>
         </div>
-
-
       </div>
     </div>
       
@@ -147,6 +144,7 @@ const app = Vue.createApp({
    
         temp:0,
         humi:0,
+        isButtonDisabled: false,
         ip:'',
         weekday:[
           "Sun",
@@ -197,7 +195,7 @@ const app = Vue.createApp({
                 formatter:'{value}%'
               },
               data:[{
-                value:this.humi,
+                value: Math.round(this.humi * 10) / 10,
                 name:"humidity"
               }]
             }
@@ -229,7 +227,7 @@ const app = Vue.createApp({
     }
   ]
 },
-     lineChartHumiOption:{
+        lineChartHumiOption:{
           xAxis: {
             type: 'category',
             data:[],
@@ -263,22 +261,24 @@ const app = Vue.createApp({
             this.ip=document.getElementById("ip").innerText
             console.log(this.ip)
         },
-        startPomodoro(time){
-          alert("Please don't refresh page during the pomodoro time!");
+        startPomodoro(time) {
+          this.isButtonDisabled = true;
 
-            var config = {
-                method: 'get',
-                url: 'http://'+this.ip+'/pomodoro/'+time,
-                headers: {} };
-            
-                axios(config)
-                    .then(function (response) {
-                        console.log(response.data);
-                    })
-                    .catch(function (error) {
-                    console.log(error);
-                    });
-                
+          var config = {
+            method: 'get',
+            url: 'http://' + this.ip + '/pomodoro/' + time,
+            headers: {},
+          };
+          
+          axios(config)
+            .then((response) => {
+              console.log(response.data);
+              this.isButtonDisabled = false;
+            })
+            .catch((error) => {
+              console.log(error);
+              this.isButtonDisabled = false;
+            });
         },
 
         QueryData(enter_point,){
