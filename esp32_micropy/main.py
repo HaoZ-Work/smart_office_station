@@ -324,6 +324,10 @@ class SmartOfficeStation():
 
 
 
+
+
+
+
     async def start_async_server():
       '''
       This function wraps server and client. By using asyncio, they run simultaneously
@@ -335,11 +339,20 @@ class SmartOfficeStation():
       query_client = self._client(self._querydht22,3)
       task3 = asyncio.create_task(query_client())
 
-      # task1 = asyncio.create_task(self._dumpdht22())
-      task2 = asyncio.create_task(app.run(host='0.0.0.0',port=80,debug=True))    
+      wifi_checker = self._client(self._check_wifi_status,3)
+      task4 = asyncio.create_task(wifi_checker())
+
+      
+      task2 = asyncio.create_task(app.run(host='0.0.0.0',port=80,debug=True))  
+
+     
+  
       await task1
       await task2
       await task3
+      await task4
+
+      
  
     #app.run(host='0.0.0.0',port=80,debug=True)
 
@@ -347,6 +360,9 @@ class SmartOfficeStation():
     asyncio.run(start_async_server())
     # print("end")
     
+
+
+ 
 
   def _client(self,func, delay):
     '''
@@ -370,6 +386,14 @@ class SmartOfficeStation():
     
     return wrapper
 
+
+  def _check_wifi_status(self):
+    sta_if = network.WLAN(network.STA_IF)
+ 
+    if not sta_if.isconnected():
+      self.SHOW_NET_CONFIG=False
+      self.SERVER_RUNNING=False
+ 
   
   def _querydht22(self):
     '''
@@ -380,10 +404,22 @@ class SmartOfficeStation():
     self.current_hudi = self.dht.humidity()
 
     if self.SHOW_NET_CONFIG==True:
-            self.oled.text("WiFi connected.",0,0)
-            self.oled.text(f"{self.netconfig[0]}",0,20)
+        self.oled.text("WiFi connected.",0,0)
+        self.oled.text(f"{self.netconfig[0]}",0,20)
+    else:
+       self.oled.fill_line(0,0)
+       self.oled.text("WiFi Disconnected.",0,0)
+      #  self.oled.fill_line(20,0)
     if self.SERVER_RUNNING==True:
-            self.oled.text("Server is on:",0,10)
+
+        self.oled.text("Server is on:",0,10)
+    else:
+        self.oled.fill_line(10,0)
+
+        self.oled.text("Server is off:",0,10)
+        self.oled.fill_line(20,0)
+        self.oled.text("Please restart.",0,20)
+
 
     self.oled.fill_line(30,0)
     self.oled.fill_line(40,0)
