@@ -1,12 +1,6 @@
 #!/bin/bash
-export PATH=$PATH:/home/ptwadmin/.local/bin/
+export PATH=$PATH:/home/ptw/.local/bin
 
-# Indicate script start with two quick beeps
-echo -e "\a"
-sleep 0.5
-echo -e "\a"
-sleep 0.5
-echo -e "\a"
 
 
 
@@ -14,7 +8,8 @@ echo -e "\a"
 set_device() {
     # The device port is passed as the first argument to the function
     device=$1
-    
+    # Indicate script beginning with red light
+    blink1-tool -m 100 --rgb=255,0,0
     # Create a temporary directory for this device
     temp_dir="temp_$(basename $device)"
     mkdir -p $temp_dir
@@ -28,11 +23,13 @@ set_device() {
     esptool.py --chip esp32 --port $device erase_flash
     echo "*****Erasing device: $device finished*****"
 
-    echo "*****Installing Micropython on device: $device *****"
-    # Install Micropython on the device
-    esptool.py --chip esp32 --port $device --baud 460800 write_flash -z 0x1000 esp32spiram-20220618-v1.19.1.bin
-    echo "*****Installing Micropython on device: $device finished *****"
+    #echo "*****Installing Micropython on device: $device *****"
+    ## Install Micropython on the device
+    #esptool.py --chip esp32 --port $device --baud 460800 write_flash -z 0x1000 esp32spiram-20220618-v1.19.1.bin
+    #echo "*****Installing Micropython on device: $device finished *****"
 
+    #esptool.py --port /dev/ttyUSB0 erase_flash
+    esptool.py --chip esp32 --port $device --baud 115200 write_flash 0x00000 esp32_dump.bin
     echo "*****Uploading files to device: $device *****"
     # Iterate over all files in the temp directory
     for file in $temp_dir/*
@@ -41,6 +38,12 @@ set_device() {
         if [[ $file == *"config.json" ]]; then
             new_uuid=$(uuidgen)
             jq --arg uuid "$new_uuid" '.DEV_ID = $uuid' $file > "$temp_dir/temp.json" && mv "$temp_dir/temp.json" $file
+            ampy --port $device put $temp_dir/config.json
+
+            if [ $? -eq 0 ]; then
+                # Indicate script completion with green light
+                blink1-tool -m 100 --rgb=0,255,0
+            fi
         fi
 
            # Skip files ending in .original
@@ -49,16 +52,19 @@ set_device() {
         fi
 
         # Upload the file to the device
-        echo "Uploading file: $file to device: $device"
-        ampy --port $device put $file
+    #    echo "Uploading file: $file to device: $device"
+    #    ampy --port $device put $file
     done
+    
+    
     # Record the end time and calculate the elapsed time
     end_time=$(date +%s)
     echo "*****Uploading files to device: $device finished *****"
     echo "Time taken: $(($end_time - $start_time)) seconds"
-
     # Remove the temporary directory
     rm -rf $temp_dir
+
+
 }
 
 # Record the start time of the whole script
@@ -102,15 +108,4 @@ ls /dev/ttyUSB* | xargs -n 1 -P $device_num -I {} bash -c 'set_device "$@"' _ {}
 
 # Print the total time taken by the script
 echo "Total time taken: $SECONDS seconds"
-
-# Indicate script completion with three quick beeps
-echo -e "\a"
-sleep 0.5
-echo -e "\a"
-sleep 0.5
-echo -e "\a"
-sleep 0.5
-echo -e "\a"
-sleep 0.5
-echo -e "\a"
 
