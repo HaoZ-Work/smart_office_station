@@ -97,10 +97,14 @@ sudo -u ptw bash -c "cd /home/ptw/Schreibtisch/smart/smart_office_station; bash 
 ```
 
 ### 6. Run the Program
+#### (1)Direct firmware flashing 
 ```bash
 bash usb_monitor.sh
 ```
-
+#### (2)Flash the system and files
+```bash
+bash usb_monitor.sh --from file
+```
 ### 7. Rules of usb light
 > -Copying: red
 >
